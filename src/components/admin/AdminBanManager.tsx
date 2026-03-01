@@ -5,9 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { UserX, UserCheck, Shield, Check, X } from "lucide-react";
+import { UserX, UserCheck } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 
 interface AdminBanManagerProps {
   user: User;
@@ -27,15 +26,6 @@ interface UserProfile {
   full_name: string | null;
 }
 
-interface BypassRequest {
-  id: string;
-  ip_address: string;
-  requested_role: string;
-  reason: string | null;
-  status: string;
-  created_at: string;
-}
-
 const AdminBanManager = ({ user, onBannedCountChange }: AdminBanManagerProps) => {
   const { toast } = useToast();
   const [bannedUsers, setBannedUsers] = useState<BannedUser[]>([]);
@@ -43,22 +33,11 @@ const AdminBanManager = ({ user, onBannedCountChange }: AdminBanManagerProps) =>
   const [selectedUserId, setSelectedUserId] = useState("");
   const [banReason, setBanReason] = useState("");
   const [loading, setLoading] = useState(false);
-  const [bypassRequests, setBypassRequests] = useState<BypassRequest[]>([]);
 
   useEffect(() => {
     fetchBannedUsers();
     fetchAllUsers();
-    fetchBypassRequests();
   }, []);
-
-  const fetchBypassRequests = async () => {
-    const { data } = await supabase
-      .from("ip_bypass_requests")
-      .select("*")
-      .eq("status", "pending")
-      .order("created_at", { ascending: false });
-    setBypassRequests(data || []);
-  };
 
   const fetchBannedUsers = async () => {
     const { data } = await supabase.from("banned_users").select("*").order("banned_at", { ascending: false });
@@ -110,23 +89,6 @@ const AdminBanManager = ({ user, onBannedCountChange }: AdminBanManagerProps) =>
       if (error) throw error;
       toast({ title: "User unbanned", description: "The user has been unbanned" });
       fetchBannedUsers();
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Error", description: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBypassAction = async (requestId: string, action: "approved" | "rejected") => {
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from("ip_bypass_requests")
-        .update({ status: action, reviewed_at: new Date().toISOString(), reviewed_by: user.id })
-        .eq("id", requestId);
-      if (error) throw error;
-      toast({ title: action === "approved" ? "Approved" : "Rejected", description: `Request has been ${action}` });
-      fetchBypassRequests();
     } catch (error: any) {
       toast({ variant: "destructive", title: "Error", description: error.message });
     } finally {
@@ -197,41 +159,6 @@ const AdminBanManager = ({ user, onBannedCountChange }: AdminBanManagerProps) =>
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5" />IP Bypass Requests ({bypassRequests.length})</CardTitle>
-          <CardDescription>Manage IP registration bypass requests from users on shared networks</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {bypassRequests.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No pending bypass requests</p>
-            ) : (
-              bypassRequests.map((request) => (
-                <div key={request.id} className="flex items-start justify-between p-3 border rounded-md">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">{request.requested_role}</Badge>
-                      <span className="text-xs text-muted-foreground">IP: {request.ip_address}</span>
-                    </div>
-                    {request.reason && <p className="text-sm text-muted-foreground mt-2">"{request.reason}"</p>}
-                    <p className="text-xs text-muted-foreground mt-1">Requested on {new Date(request.created_at!).toLocaleDateString()}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleBypassAction(request.id, "approved")} disabled={loading}>
-                      <Check className="h-4 w-4 mr-1" />Approve
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleBypassAction(request.id, "rejected")} disabled={loading}>
-                      <X className="h-4 w-4 mr-1" />Reject
-                    </Button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

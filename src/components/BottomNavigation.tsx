@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Home, CreditCard, MessageSquare, Video, Bot, Info, Phone } from "lucide-react";
+import { Home, MessageSquare, Video, Bot, Info, Phone } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BottomNavigationProps {
@@ -12,7 +12,6 @@ const BottomNavigation = ({ onScrollTo }: BottomNavigationProps) => {
 
   const navItems = [
     { id: "hero", icon: Home, label: t("student.nav.hero") },
-    { id: "subscription", icon: CreditCard, label: t("student.nav.subscription") },
     { id: "messages", icon: MessageSquare, label: t("messages"), isLink: true },
     { id: "videos", icon: Video, label: t("student.nav.videos") },
     { id: "assistant", icon: Bot, label: t("student.nav.assistant") },
