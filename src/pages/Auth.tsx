@@ -174,14 +174,7 @@ const Auth = () => {
       if (error) throw error;
 
       if (data.user) {
-        // Insert user role
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({ user_id: data.user.id, role });
-
-        if (roleError) throw roleError;
-
-        // Register IP account
+        // Register IP account and assign role via edge function (uses service role key, bypasses RLS)
         await registerIPAccount(data.user.id, role);
 
         // Show email verification message

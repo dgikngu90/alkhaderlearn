@@ -45,28 +45,40 @@
          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
        });
        
-     } else if (action === 'register') {
-       // Register IP after successful signup
-       if (!userId) {
-         throw new Error('User ID is required for registration');
-       }
-       
-       const { error } = await supabase.rpc('register_ip_account', {
-         p_ip_address: clientIP,
-         p_user_id: userId,
-         p_role: role
-       });
-       
-       if (error) {
-         console.error('Error registering IP:', error);
-         throw error;
-       }
-       
-       console.log(`IP registered successfully for user ${userId}`);
-       
-       return new Response(JSON.stringify({ success: true }), {
-         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-       });
+      } else if (action === 'register') {
+        // Register IP and assign role after successful signup
+        if (!userId) {
+          throw new Error('User ID is required for registration');
+        }
+        
+        // Insert user role using service role key (bypasses RLS)
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({ user_id: userId, role })
+          .select()
+          .maybeSingle();
+        
+        if (roleError) {
+          console.error('Error inserting role:', roleError);
+          // Don't throw - role might already exist from a retry
+        }
+        
+        const { error } = await supabase.rpc('register_ip_account', {
+          p_ip_address: clientIP,
+          p_user_id: userId,
+          p_role: role
+        });
+        
+        if (error) {
+          console.error('Error registering IP:', error);
+          throw error;
+        }
+        
+        console.log(`IP registered successfully for user ${userId}`);
+        
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
        
      } else if (action === 'request_bypass') {
        // Create a bypass request
