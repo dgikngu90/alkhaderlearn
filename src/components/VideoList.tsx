@@ -5,8 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Play, Eye, Trash2, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Play, Trash2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Video {
@@ -28,16 +27,13 @@ interface VideoListProps {
   userId?: string;
   isTeacher: boolean;
   selectedCategory?: string;
-  onShowPremiumDialog?: () => void;
-  hasActiveSubscription?: boolean;
 }
 
-const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, onShowPremiumDialog, hasActiveSubscription }: VideoListProps) => {
+const VideoList = ({ teacherId, userId, isTeacher, selectedCategory }: VideoListProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
   const [videos, setVideos] = useState<Video[]>([]);
-  const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
   const [thumbnailUrls, setThumbnailUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
@@ -91,20 +87,6 @@ const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, onShowPremi
         });
         setThumbnailUrls(thumbnailMap);
       }
-
-      // Fetch view counts for students
-      if (userId && !isTeacher) {
-        const { data: viewData } = await supabase
-          .from("video_views")
-          .select("video_id, view_count")
-          .eq("user_id", userId);
-
-        const counts: Record<string, number> = {};
-        viewData?.forEach((view) => {
-          counts[view.video_id] = view.view_count;
-        });
-        setViewCounts(counts);
-      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -116,16 +98,12 @@ const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, onShowPremi
     }
   };
 
-  // Helper function to extract storage path from URL or path string
   const extractStoragePath = (url: string): string => {
     if (url.includes('/storage/v1/object/public/videos/')) {
-      // Old format: https://...supabase.co/storage/v1/object/public/videos/path/to/file.mp4
       return url.split('/storage/v1/object/public/videos/')[1];
     } else if (url.startsWith('videos/')) {
-      // New format: videos/path/to/file.mp4
       return url.replace('videos/', '');
     } else {
-      // Already in correct format: path/to/file.mp4
       return url;
     }
   };
@@ -135,66 +113,11 @@ const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, onShowPremi
   }, [teacherId, userId, selectedCategory]);
 
   const handleWatch = async (video: Video) => {
-    try {
-      console.log('Starting video watch process for:', video.title);
-
-      // For teachers, navigate directly to video player
-      if (isTeacher) {
-        console.log('User is teacher, navigating to video player');
-        navigate(`/video/${video.id}`);
-        return;
-      }
-
-      // For students, enforce view limit server-side
-      if (!userId) {
-        console.log('No user ID found, redirecting to auth');
-        navigate("/auth");
-        return;
-      }
-
-      console.log('Checking view count for user:', userId, 'hasSubscription:', hasActiveSubscription);
-      
-      // Call server-side function that validates view limit
-      const { data: result, error } = await supabase
-        .rpc('increment_view_count', {
-          p_video_id: video.id
-        });
-
-      console.log('View count increment result:', { result, error });
-
-      const typedResult = result as { success: boolean; error?: string; view_count?: number } | null;
-
-      if (error || !typedResult?.success) {
-        console.log('View limit error:', error || typedResult?.error);
-        // Show premium dialog for non-subscribers who hit the limit
-        if (!hasActiveSubscription && onShowPremiumDialog) {
-          onShowPremiumDialog();
-        }
-        toast({
-          title: "View limit reached",
-          description: typedResult?.error || error?.message || "You've reached your view limit. Upgrade to premium for unlimited access.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Update local state
-      console.log('View count incremented successfully, new count:', typedResult.view_count);
-      setViewCounts(prev => ({
-        ...prev,
-        [video.id]: typedResult.view_count || 0
-      }));
-
-      // Navigate to video player page
-      navigate(`/video/${video.id}`);
-    } catch (error: any) {
-      console.error('Error in handleWatch:', error);
-      toast({
-        title: "Error",
-        description: error?.message || "Failed to access video",
-        variant: "destructive",
-      });
+    if (!userId) {
+      navigate("/auth");
+      return;
     }
+    navigate(`/video/${video.id}`);
   };
 
   const handleDelete = async (videoId: string) => {
@@ -233,12 +156,8 @@ const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, onShowPremi
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {videos.map((video) => {
-        const views = viewCounts[video.id] || 0;
-        const canWatch = isTeacher || views < 2;
-
-        return (
-          <Card key={video.id} className="overflow-hidden">
+      {videos.map((video) => (
+        <Card key={video.id} className="overflow-hidden">
           <CardHeader className="p-0">
             {thumbnailUrls[video.id] ? (
               <img
@@ -252,72 +171,41 @@ const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, onShowPremi
               </div>
             )}
           </CardHeader>
-            <CardContent className="p-4">
-              <CardTitle className="text-lg mb-2">{video.title}</CardTitle>
-              <Badge variant="outline" className="mb-2">{video.category}</Badge>
-              {video.teacher_name && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  {video.teacher_name}
-                </p>
-              )}
-              {video.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {video.description}
-                </p>
-              )}
-              {!isTeacher && (
-                <div className="mt-3 flex items-center gap-2">
-                  <Badge variant={views >= 2 ? "destructive" : "secondary"}>
-                    <Eye className="h-3 w-3 mr-1" />
-                    {views}/2 {t("video.views")}
-                  </Badge>
-                </div>
-              )}
-            </CardContent>
-            <CardFooter className="p-4 pt-0 flex gap-2">
-              {isTeacher ? (
-                <>
-                  <Button
-                    size="sm"
-                    onClick={() => handleWatch(video)}
-                    className="flex-1"
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    {t("video.watch")}
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(video.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    size="sm"
-                    onClick={() => handleWatch(video)}
-                    disabled={!canWatch}
-                    className="flex-1"
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    {canWatch ? t("video.watch") : t("video.limit")}
-                  </Button>
-                  {!canWatch && (
-                    <Alert className="mt-2">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription className="text-xs">
-                        {t("video.upgrade")}
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </>
-              )}
-            </CardFooter>
-          </Card>
-        );
-      })}
+          <CardContent className="p-4">
+            <CardTitle className="text-lg mb-2">{video.title}</CardTitle>
+            <Badge variant="outline" className="mb-2">{video.category}</Badge>
+            {video.teacher_name && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {video.teacher_name}
+              </p>
+            )}
+            {video.description && (
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {video.description}
+              </p>
+            )}
+          </CardContent>
+          <CardFooter className="p-4 pt-0 flex gap-2">
+            <Button
+              size="sm"
+              onClick={() => handleWatch(video)}
+              className="flex-1"
+            >
+              <Play className="h-4 w-4 mr-2" />
+              {t("video.watch")}
+            </Button>
+            {isTeacher && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => handleDelete(video.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   );
 };

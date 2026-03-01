@@ -1,21 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Video, CheckCircle, Lock, Zap, Star, BookOpen, Phone, Download } from "lucide-react";
+import { Video, CheckCircle, Zap, Star, BookOpen, Phone, Download } from "lucide-react";
 import VideoList from "./VideoList";
-import SubscriptionCard from "./SubscriptionCard";
 import StudyAssistantChat from "./StudyAssistantChat";
 import BottomNavigation from "./BottomNavigation";
-import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import arabicBg from "@/assets/category-arabic.jpeg";
 import biologyBg from "@/assets/category-biology.jpeg";
@@ -29,9 +19,7 @@ interface StudentDashboardProps {
 
 const StudentDashboard = ({ user }: StudentDashboardProps) => {
   const { t } = useLanguage();
-  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [showPremiumDialog, setShowPremiumDialog] = useState(false);
 
   const categories = [
     { name: "عربي", image: arabicBg },
@@ -46,26 +34,6 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
     const category = categories.find(cat => cat.name === selectedCategory);
     return category?.image || "";
   };
-
-  const checkSubscription = async () => {
-    if (!user) {
-      setHasActiveSubscription(false);
-      return;
-    }
-    const { data } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .gte("expires_at", new Date().toISOString())
-      .maybeSingle();
-
-    setHasActiveSubscription(!!data);
-  };
-
-  useEffect(() => {
-    checkSubscription();
-  }, [user?.id]);
 
   const handleScrollTo = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -95,7 +63,6 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
           id="hero"
           className="min-h-[90vh] flex flex-col items-center justify-center px-4 py-20 relative overflow-hidden"
         >
-          {/* Background Gradient Orbs */}
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
           
@@ -158,15 +125,6 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
           </div>
         </section>
 
-        {/* Subscription Card */}
-        <div id="subscription" className="px-4 py-8 max-w-4xl mx-auto">
-          <SubscriptionCard
-            userId={user?.id} 
-            hasActiveSubscription={hasActiveSubscription}
-            onSubscriptionChange={checkSubscription}
-          />
-        </div>
-
         {/* Study Assistant */}
         <div id="assistant" className="px-4 pb-8 max-w-4xl mx-auto">
           <StudyAssistantChat />
@@ -226,8 +184,6 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
                 userId={user?.id} 
                 isTeacher={false} 
                 selectedCategory={selectedCategory === "all" ? undefined : selectedCategory}
-                onShowPremiumDialog={() => setShowPremiumDialog(true)}
-                hasActiveSubscription={hasActiveSubscription}
               />
             </CardContent>
           </Card>
@@ -272,84 +228,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
       <BottomNavigation onScrollTo={handleScrollTo} />
-
-      {/* Premium Dialog */}
-      <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
-        <DialogContent className="sm:max-w-md glass">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              <Star className="h-6 w-6 text-primary" />
-              {t("premium.title")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("premium.desc")}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium">{t("premium.feature.unlimited")}</p>
-                <p className="text-sm text-muted-foreground">{t("premium.feature.unlimited.desc")}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium">{t("premium.feature.hd")}</p>
-                <p className="text-sm text-muted-foreground">{t("premium.feature.hd.desc")}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="h-4 w-4 text-accent" />
-              </div>
-              <div>
-                <p className="font-medium">{t("premium.feature.ai")}</p>
-                <p className="text-sm text-muted-foreground">{t("premium.feature.ai.desc")}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Lock className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium">{t("premium.feature.exclusive")}</p>
-                <p className="text-sm text-muted-foreground">{t("premium.feature.exclusive.desc")}</p>
-              </div>
-            </div>
-
-            <div className="gradient-border rounded-xl p-4 text-center bg-card">
-              <p className="text-3xl font-bold gradient-text">1 JOD/month</p>
-              <p className="text-sm text-muted-foreground">{t("premium.price.desc")}</p>
-            </div>
-          </div>
-
-          <DialogFooter className="flex-col sm:flex-col gap-2">
-            <Button onClick={() => {
-              setShowPremiumDialog(false);
-              handleScrollTo('subscription');
-            }} className="w-full rounded-full press-effect">
-              {t("premium.get")}
-            </Button>
-            <Button variant="ghost" onClick={() => {
-              setShowPremiumDialog(false);
-            }} className="w-full">
-              {t("premium.continue.free")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

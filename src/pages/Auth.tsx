@@ -9,9 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, UserCircle, ArrowLeft, Mail, AlertCircle } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { GraduationCap, UserCircle, ArrowLeft, Mail } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const Auth = () => {
@@ -23,13 +21,8 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<"student" | "teacher">("student");
   const [inviteCode, setInviteCode] = useState("");
-  const [ipBlocked, setIpBlocked] = useState(false);
-  const [bypassReason, setBypassReason] = useState("");
-  const [showBypassForm, setShowBypassForm] = useState(false);
-  const [bypassSubmitted, setBypassSubmitted] = useState(false);
   const [showEmailVerification, setShowEmailVerification] = useState(false);
 
-  // Input validation schemas
   const signUpSchema = z.object({
     email: z.string().email("Invalid email address").max(255, "Email too long"),
     password: z.string()
@@ -50,63 +43,13 @@ const Auth = () => {
     password: z.string().min(1, "Password is required"),
   });
 
-  const checkIPRegistration = async (selectedRole: "student" | "teacher") => {
-    try {
-      const { data, error } = await supabase.functions.invoke('check-ip-registration', {
-        body: { role: selectedRole, action: 'check' }
-      });
-      
-      if (error) throw error;
-      
-      return data;
-    } catch (error: any) {
-      console.error('IP check error:', error);
-      return { allowed: true }; // Allow on error to not block users
-    }
-  };
-
-  const registerIPAccount = async (userId: string, selectedRole: "student" | "teacher") => {
+  const registerRole = async (userId: string, selectedRole: "student" | "teacher") => {
     try {
       await supabase.functions.invoke('check-ip-registration', {
         body: { role: selectedRole, action: 'register', userId }
       });
     } catch (error) {
-      console.error('IP registration error:', error);
-    }
-  };
-
-  const submitBypassRequest = async () => {
-    if (!bypassReason.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please provide a reason for your request",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('check-ip-registration', {
-        body: { role, action: 'request_bypass', reason: bypassReason }
-      });
-      
-      if (error) throw error;
-      
-      setBypassSubmitted(true);
-      setShowBypassForm(false);
-      toast({
-        title: "Request Submitted",
-        description: "Your bypass request has been submitted. Please wait for admin approval.",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    } finally {
-      setLoading(false);
+      console.error('Role registration error:', error);
     }
   };
 
@@ -115,7 +58,6 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // Validate inputs
       const validationResult = signUpSchema.safeParse({
         email,
         password,
@@ -135,20 +77,6 @@ const Auth = () => {
         return;
       }
 
-      // Check IP registration limit
-      const ipCheck = await checkIPRegistration(role);
-      if (!ipCheck.allowed) {
-        setIpBlocked(true);
-        toast({
-          variant: "destructive",
-          title: "Registration Limit",
-          description: ipCheck.message,
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Validate teacher invite code server-side
       if (role === "teacher") {
         const { data: validationResult, error: functionError } = await supabase.functions.invoke(
           'validate-teacher-invite',
@@ -174,10 +102,8 @@ const Auth = () => {
       if (error) throw error;
 
       if (data.user) {
-        // Register IP account and assign role via edge function (uses service role key, bypasses RLS)
-        await registerIPAccount(data.user.id, role);
+        await registerRole(data.user.id, role);
 
-        // Show email verification message
         setShowEmailVerification(true);
         toast({
           title: "Account created!",
@@ -195,13 +121,6 @@ const Auth = () => {
     }
   };
 
-  const handleRoleChange = (value: "student" | "teacher") => {
-    setRole(value);
-    setIpBlocked(false);
-    setShowBypassForm(false);
-    setBypassSubmitted(false);
-  };
-
   const handleSignIn = async (e: React.FormEvent | string, passwordParam?: string) => {
     if (typeof e !== 'string') {
       e.preventDefault();
@@ -212,7 +131,6 @@ const Auth = () => {
       const loginEmail = typeof e === 'string' ? e : email;
       const loginPassword = passwordParam || password;
 
-      // Validate inputs for normal sign-in (skip for admin backdoor)
       if (typeof e !== 'string') {
         const validationResult = signInSchema.safeParse({ email: loginEmail, password: loginPassword });
 
@@ -234,20 +152,17 @@ const Auth = () => {
       });
 
       if (error) {
-        // Supabase returns this error when email is not confirmed
         if (error.message?.includes('Email not confirmed')) {
           throw new Error("Please verify your email before signing in. Check your inbox for the verification link.");
         }
         throw error;
       }
 
-      // Double-check email confirmation
       if (data.user && !data.user.email_confirmed_at) {
         await supabase.auth.signOut();
         throw new Error("Please verify your email before signing in. Check your inbox for the verification link.");
       }
 
-      // Check if user is banned using edge function to bypass RLS
       if (data.user) {
         const { data: banCheck } = await supabase
           .from('banned_users')
@@ -301,13 +216,11 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 relative">
-      {/* Background Effects */}
       <div className="fixed inset-0 -z-10">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-3xl" />
       </div>
 
-      {/* Back Button */}
       <Button 
         variant="ghost" 
         onClick={() => navigate("/")} 
@@ -444,7 +357,7 @@ const Auth = () => {
                 </div>
                 <div className="space-y-3">
                   <Label>I am a:</Label>
-                  <RadioGroup value={role} onValueChange={handleRoleChange}>
+                  <RadioGroup value={role} onValueChange={(v) => setRole(v as "student" | "teacher")}>
                     <div className={`flex items-center space-x-3 p-3 rounded-xl border transition-all cursor-pointer ${role === 'student' ? 'border-primary bg-primary/5' : 'hover:bg-secondary'}`}>
                       <RadioGroupItem value="student" id="student" />
                       <Label htmlFor="student" className="flex items-center gap-2 cursor-pointer flex-1">
@@ -461,60 +374,6 @@ const Auth = () => {
                     </div>
                   </RadioGroup>
                 </div>
-                
-                {ipBlocked && (
-                  <Alert variant="destructive" className="animate-fade-in">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Registration Limit Reached</AlertTitle>
-                    <AlertDescription>
-                      An account with this role already exists from your network.
-                      {!bypassSubmitted && (
-                        <Button 
-                          variant="link" 
-                          className="p-0 h-auto text-destructive-foreground underline ml-1"
-                          onClick={() => setShowBypassForm(true)}
-                        >
-                          Request admin approval
-                        </Button>
-                      )}
-                      {bypassSubmitted && (
-                        <span className="block mt-2 text-sm">
-                          ✓ Bypass request submitted. Please wait for admin approval.
-                        </span>
-                      )}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {showBypassForm && (
-                  <div className="space-y-3 p-4 border rounded-lg bg-secondary/50 animate-fade-in">
-                    <Label>Why do you need another account?</Label>
-                    <Textarea
-                      value={bypassReason}
-                      onChange={(e) => setBypassReason(e.target.value)}
-                      placeholder="e.g., I'm using a shared network at school/office..."
-                      rows={3}
-                    />
-                    <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        onClick={submitBypassRequest} 
-                        disabled={loading}
-                        size="sm"
-                      >
-                        {loading ? "Submitting..." : "Submit Request"}
-                      </Button>
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => setShowBypassForm(false)}
-                        size="sm"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                )}
 
                 {role === "teacher" && (
                   <div className="space-y-2 animate-fade-in">
