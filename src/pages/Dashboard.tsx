@@ -57,10 +57,11 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       if (!user) {
-        setRole("student"); // Default to student view for unauthenticated users
-        setLoading(false);
+        setRole("student");
         return;
       }
+
+      setRole(null); // Reset role while fetching to prevent flash of wrong dashboard
 
       const { data, error } = await supabase
         .from("user_roles")
@@ -71,7 +72,7 @@ const Dashboard = () => {
         if (import.meta.env.DEV) {
           console.error("Error fetching role:", error);
         }
-        setLoading(false);
+        setRole("student");
         return;
       }
 
@@ -80,8 +81,6 @@ const Dashboard = () => {
       else if (roles.includes("teacher")) setRole("teacher");
       else if (roles.includes("student")) setRole("student");
       else setRole("student");
-
-      setLoading(false);
     };
 
     fetchUserRole();
@@ -96,7 +95,7 @@ const Dashboard = () => {
     navigate("/auth");
   };
 
-  if (loading) {
+  if (loading || role === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
