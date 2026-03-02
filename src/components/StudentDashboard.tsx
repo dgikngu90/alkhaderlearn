@@ -228,7 +228,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
         </div>
       </div>
 
-      <BottomNavigation onScrollTo={handleScrollTo} />
+      <BottomNavigation />
     </div>
   );
 };
