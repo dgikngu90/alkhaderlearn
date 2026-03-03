@@ -50,25 +50,27 @@
         if (!userId) {
           throw new Error('User ID is required for registration');
         }
-        
-        // Insert user role using service role key (bypasses RLS)
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role })
-          .select()
-          .maybeSingle();
-        
-        if (roleError) {
-          console.error('Error inserting role:', roleError);
-          // Don't throw - role might already exist from a retry
+
+        if (role !== 'student' && role !== 'teacher') {
+          throw new Error('Invalid role. Only student or teacher are allowed');
         }
-        
+
+        const { error: roleError } = await supabase.rpc('assign_user_role', {
+          p_user_id: userId,
+          p_role: role,
+        });
+
+        if (roleError) {
+          console.error('Error assigning role:', roleError);
+          throw new Error('Failed to assign role during registration');
+        }
+
         const { error } = await supabase.rpc('register_ip_account', {
           p_ip_address: clientIP,
           p_user_id: userId,
           p_role: role
         });
-        
+
         if (error) {
           console.error('Error registering IP:', error);
           throw error;

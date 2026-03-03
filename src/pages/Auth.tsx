@@ -44,12 +44,12 @@ const Auth = () => {
   });
 
   const registerRole = async (userId: string, selectedRole: "student" | "teacher") => {
-    try {
-      await supabase.functions.invoke('check-ip-registration', {
-        body: { role: selectedRole, action: 'register', userId }
-      });
-    } catch (error) {
-      console.error('Role registration error:', error);
+    const { error } = await supabase.functions.invoke('check-ip-registration', {
+      body: { role: selectedRole, action: 'register', userId }
+    });
+
+    if (error) {
+      throw new Error("Could not assign your role during signup. Please try again.");
     }
   };
 
