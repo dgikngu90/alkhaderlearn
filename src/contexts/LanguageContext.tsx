@@ -37,6 +37,8 @@ const translations = {
     "settings.language": "Language",
     "settings.language.desc": "Choose your preferred language",
     "settings.back": "Back to Dashboard",
+    "settings.darkMode": "Dark Mode",
+    "settings.darkMode.desc": "Switch between light and dark theme",
     
     // Student Dashboard
     "student.videos": "Available Videos",
@@ -181,6 +183,8 @@ const translations = {
     "settings.language": "اللغة",
     "settings.language.desc": "اختر لغتك المفضلة",
     "settings.back": "العودة إلى لوحة التحكم",
+    "settings.darkMode": "الوضع الداكن",
+    "settings.darkMode.desc": "التبديل بين المظهر الفاتح والداكن",
     
     // Student Dashboard
     "student.videos": "الفيديوهات المتاحة",
