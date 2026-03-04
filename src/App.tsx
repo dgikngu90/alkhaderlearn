@@ -13,6 +13,8 @@ import Assistant from "./pages/Assistant";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import VideoPlayer from "./pages/VideoPlayer";
+import TakeQuiz from "./pages/TakeQuiz";
+import QuizResult from "./pages/QuizResult";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,8 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/video/:videoId" element={<VideoPlayer />} />
+          <Route path="/quiz/:quizId" element={<TakeQuiz />} />
+          <Route path="/quiz-result/:attemptId" element={<QuizResult />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
