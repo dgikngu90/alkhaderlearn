@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Video, CheckCircle, Zap, Star, BookOpen, Phone, Download } from "lucide-react";
+import { Video, CheckCircle, Zap, Star, BookOpen, Phone, Download, ClipboardList } from "lucide-react";
 import VideoList from "./VideoList";
 import StudyAssistantChat from "./StudyAssistantChat";
+import StudentQuizList from "./StudentQuizList";
 import BottomNavigation from "./BottomNavigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -129,6 +130,26 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
         <div id="assistant" className="px-4 pb-8 max-w-4xl mx-auto">
           <StudyAssistantChat />
         </div>
+
+        {/* Quizzes Section */}
+        {user && (
+          <div id="quizzes" className="px-4 pb-8 max-w-4xl mx-auto">
+            <Card className="glass border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-2xl">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <ClipboardList className="h-5 w-5 text-primary" />
+                  </div>
+                  {t("quiz.available")}
+                </CardTitle>
+                <CardDescription>{t("quiz.availableDesc")}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <StudentQuizList user={user} />
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Videos Section */}
         <div id="videos" className="px-4 pb-8 max-w-6xl mx-auto">
