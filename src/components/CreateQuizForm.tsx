@@ -187,26 +187,52 @@ const CreateQuizForm = ({ user, onQuizCreated }: CreateQuizFormProps) => {
 
                 {q.question_type === "multiple_choice" && (
                   <div className="space-y-2">
-                    <Label className="text-sm">{t("quiz.options")}</Label>
+                    <Label className="text-sm">{t("quiz.options")} — {t("quiz.clickCorrect")}</Label>
                     {q.options.map((opt, oIndex) => (
-                      <Input
-                        key={oIndex}
-                        value={opt}
-                        onChange={e => updateOption(qIndex, oIndex, e.target.value)}
-                        placeholder={`${t("quiz.option")} ${oIndex + 1}`}
-                      />
+                      <div key={oIndex} className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (opt.trim()) updateQuestion(qIndex, "correct_answer", opt.trim());
+                          }}
+                          className={`shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                            q.correct_answer === opt.trim() && opt.trim()
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-muted-foreground/40 hover:border-primary"
+                          }`}
+                          title={t("quiz.markCorrect")}
+                        >
+                          {q.correct_answer === opt.trim() && opt.trim() && (
+                            <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                          )}
+                        </button>
+                        <Input
+                          value={opt}
+                          onChange={e => {
+                            const oldVal = q.options[oIndex].trim();
+                            updateOption(qIndex, oIndex, e.target.value);
+                            // Update correct_answer if it was pointing to old value
+                            if (q.correct_answer === oldVal && oldVal) {
+                              updateQuestion(qIndex, "correct_answer", e.target.value.trim());
+                            }
+                          }}
+                          placeholder={`${t("quiz.option")} ${oIndex + 1}`}
+                        />
+                      </div>
                     ))}
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <Label className="text-sm">{t("quiz.correctAnswer")}</Label>
-                  <Input
-                    value={q.correct_answer}
-                    onChange={e => updateQuestion(qIndex, "correct_answer", e.target.value)}
-                    placeholder={t("quiz.correctAnswerPlaceholder")}
-                  />
-                </div>
+                {q.question_type === "text" && (
+                  <div className="space-y-2">
+                    <Label className="text-sm">{t("quiz.correctAnswer")}</Label>
+                    <Input
+                      value={q.correct_answer}
+                      onChange={e => updateQuestion(qIndex, "correct_answer", e.target.value)}
+                      placeholder={t("quiz.correctAnswerPlaceholder")}
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label className="text-sm">{t("quiz.points")}</Label>
