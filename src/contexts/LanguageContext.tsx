@@ -209,6 +209,11 @@ const translations = {
     "quiz.aiFeedback": "AI Feedback",
     "quiz.yourAnswer": "Your answer",
     "quiz.noAnswer": "no answer",
+    "quiz.clickCorrect": "Click the circle to mark the correct answer",
+    "quiz.markCorrect": "Mark as correct",
+    "quiz.studentResults": "Student Results",
+    "quiz.noSubmissions": "No submissions yet",
+    "quiz.viewStudentResults": "View student results",
   },
   ar: {
     // Landing Page
@@ -410,6 +415,11 @@ const translations = {
     "quiz.aiFeedback": "ملاحظات الذكاء الاصطناعي",
     "quiz.yourAnswer": "إجابتك",
     "quiz.noAnswer": "بدون إجابة",
+    "quiz.clickCorrect": "اضغط على الدائرة لتحديد الإجابة الصحيحة",
+    "quiz.markCorrect": "تحديد كإجابة صحيحة",
+    "quiz.studentResults": "نتائج الطلاب",
+    "quiz.noSubmissions": "لا توجد إجابات بعد",
+    "quiz.viewStudentResults": "عرض نتائج الطلاب",
   },
 };
 
