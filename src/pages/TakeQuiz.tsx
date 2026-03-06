@@ -32,15 +32,19 @@ const TakeQuiz = () => {
     setSubmitting(true);
 
     try {
-      // Save answers
-      await supabase
+      // Save answers first
+      const { error: saveErr } = await supabase
         .from("quiz_attempts")
-        .update({ answers: currentAnswers, status: "submitted", submitted_at: new Date().toISOString() })
+        .update({ answers: currentAnswers, submitted_at: new Date().toISOString() })
         .eq("id", currentAttemptId);
 
-      // Call AI grading
+      if (saveErr) {
+        console.error("Failed to save answers:", saveErr);
+      }
+
+      // Call AI grading (also passes answers as backup)
       const { data, error } = await supabase.functions.invoke("grade-quiz", {
-        body: { attempt_id: currentAttemptId },
+        body: { attempt_id: currentAttemptId, answers: currentAnswers },
       });
 
       if (error) throw error;
@@ -77,14 +81,17 @@ const TakeQuiz = () => {
 
       setQuestions(questionsData || []);
 
-      // Check existing attempt
-      const { data: existing } = await supabase
+      // Check existing in-progress attempt (get latest one)
+      const { data: existingList } = await supabase
         .from("quiz_attempts")
         .select("*")
         .eq("quiz_id", quizId)
         .eq("student_id", user.id)
         .eq("status", "in_progress")
-        .maybeSingle();
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      const existing = existingList?.[0] || null;
 
       if (existing) {
         setAttemptId(existing.id);
@@ -96,14 +103,17 @@ const TakeQuiz = () => {
           setTimeLeft(Math.max(0, Math.floor(remaining)));
         }
       } else {
-        // Check if already graded
-        const { data: graded } = await supabase
+        // Check if already graded (get latest)
+        const { data: gradedList } = await supabase
           .from("quiz_attempts")
           .select("id")
           .eq("quiz_id", quizId)
           .eq("student_id", user.id)
           .eq("status", "graded")
-          .maybeSingle();
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        const graded = gradedList?.[0] || null;
 
         if (graded) {
           navigate(`/quiz-result/${graded.id}`, { replace: true });
