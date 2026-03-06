@@ -10,12 +10,20 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { attempt_id } = await req.json();
+    const { attempt_id, answers: submittedAnswers } = await req.json();
     if (!attempt_id) throw new Error("attempt_id is required");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    // If answers were passed from the client, save them first
+    if (submittedAnswers && Object.keys(submittedAnswers).length > 0) {
+      await supabase
+        .from("quiz_attempts")
+        .update({ answers: submittedAnswers, submitted_at: new Date().toISOString() })
+        .eq("id", attempt_id);
+    }
 
     // Fetch attempt with quiz and questions
     const { data: attempt, error: attemptErr } = await supabase
