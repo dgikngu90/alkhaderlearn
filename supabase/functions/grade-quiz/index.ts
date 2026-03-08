@@ -63,12 +63,7 @@ serve(async (req) => {
       });
     }
 
-    if (correctAnswers > 0) {
-      await supabase.rpc('add_quiz_points', {
-        p_user_id: attempt.student_id,
-        p_correct_answers: correctAnswers
-      });
-    }
+    // Points tracking could be added here in the future
 
     // Use AI for feedback on text answers
     let aiFeedback = "";
