@@ -99,41 +99,31 @@ const Dashboard = () => {
         if (isMounted) setRole("student");
       }, 8000);
 
-      // Retry logic: RLS may reject the first call if session isn't propagated yet
-      let roles: string[] = [];
-      for (let attempt = 0; attempt < 3; attempt++) {
-        const { data, error } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id);
+      try {
+        const [adminRes, teacherRes, studentRes] = await Promise.all([
+          supabase.rpc("has_role", { _user_id: user.id, _role: "admin" }),
+          supabase.rpc("has_role", { _user_id: user.id, _role: "teacher" }),
+          supabase.rpc("has_role", { _user_id: user.id, _role: "student" }),
+        ]);
 
-        if (!isMounted) { window.clearTimeout(roleFallback); return; }
+        if (!isMounted) return;
 
-        if (error) {
-          if (import.meta.env.DEV) console.error("Error fetching role:", error);
-          if (attempt < 2) {
-            await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
-            continue;
-          }
-          break;
+        const isAdmin = !!adminRes.data;
+        const isTeacher = !!teacherRes.data;
+        const isStudent = !!studentRes.data;
+
+        if (isAdmin) setRole("admin");
+        else if (isTeacher) setRole("teacher");
+        else if (isStudent) setRole("student");
+        else setRole("student");
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          console.error("Error resolving role:", error);
         }
-
-        roles = (data || []).map((r: { role: string }) => r.role);
-        if (roles.length > 0) break;
-
-        // Empty result might mean RLS hasn't caught up; wait and retry
-        if (attempt < 2) {
-          await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
-        }
+        if (isMounted) setRole("student");
+      } finally {
+        window.clearTimeout(roleFallback);
       }
-
-      window.clearTimeout(roleFallback);
-      if (!isMounted) return;
-
-      if (roles.includes("admin")) setRole("admin");
-      else if (roles.includes("teacher")) setRole("teacher");
-      else if (roles.includes("student")) setRole("student");
-      else setRole("student");
     };
 
     fetchUserRole();
