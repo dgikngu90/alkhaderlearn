@@ -21,52 +21,92 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      (_event, nextSession) => {
+        if (!isMounted) return;
+        setSession(nextSession);
+        setUser(nextSession?.user ?? null);
+        setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        // Check if user is banned
-        const { data: banCheck } = await supabase
-          .from('banned_users')
-          .select('id')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-        
-        if (banCheck) {
-          await supabase.auth.signOut();
-          setSession(null);
-          setUser(null);
-          setLoading(false);
-          navigate("/auth");
-          return;
-        }
-      }
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const bootstrapSession = async () => {
+      try {
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
 
-    return () => subscription.unsubscribe();
-  }, []);
+        if (error) throw error;
+        if (!isMounted) return;
+
+        if (currentSession?.user) {
+          const { data: isBanned, error: banError } = await supabase.rpc("is_user_banned", {
+            user_id: currentSession.user.id,
+          });
+
+          if (!isMounted) return;
+
+          if (banError && import.meta.env.DEV) {
+            console.error("Ban check failed:", banError);
+          }
+
+          if (isBanned) {
+            await supabase.auth.signOut();
+            if (!isMounted) return;
+            setSession(null);
+            setUser(null);
+            navigate("/auth");
+            return;
+          }
+        }
+
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          console.error("Session bootstrap failed:", error);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    bootstrapSession();
+
+    const loadingFallback = window.setTimeout(() => {
+      if (isMounted) setLoading(false);
+    }, 10000);
+
+    return () => {
+      isMounted = false;
+      window.clearTimeout(loadingFallback);
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchUserRole = async () => {
       if (!user) {
         setRole("student");
         return;
       }
 
-      setRole(null); // Reset role while fetching to prevent flash of wrong dashboard
+      setRole(null);
+
+      const roleFallback = window.setTimeout(() => {
+        if (isMounted) setRole("student");
+      }, 8000);
 
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id);
+
+      window.clearTimeout(roleFallback);
+
+      if (!isMounted) return;
 
       if (error) {
         if (import.meta.env.DEV) {
@@ -84,6 +124,10 @@ const Dashboard = () => {
     };
 
     fetchUserRole();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   const handleSignOut = async () => {
