@@ -3,7 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Video, Mail, ClipboardList, Users, Eye, Trophy } from "lucide-react";
+import { Video, Mail, ClipboardList, Users, Eye, Trophy, Inbox } from "lucide-react";
 import VideoList from "./VideoList";
 import VideoUploadForm from "./VideoUploadForm";
 import SendMessageDialog from "./SendMessageDialog";
