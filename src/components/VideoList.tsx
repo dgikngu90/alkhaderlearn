@@ -27,6 +27,7 @@ interface VideoListProps {
   userId?: string;
   isTeacher: boolean;
   selectedCategory?: string;
+  selectedGrade?: string;
 }
 
 const VideoList = ({ teacherId, userId, isTeacher, selectedCategory }: VideoListProps) => {
