@@ -134,6 +134,22 @@ const CreateQuizForm = ({ user, onQuizCreated }: CreateQuizFormProps) => {
           <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder={t("quiz.descriptionPlaceholder")} />
         </div>
 
+        <div className="space-y-2">
+          <Label>{t("grade.label") || "Grade"}</Label>
+          <Select value={grade} onValueChange={setGrade}>
+            <SelectTrigger>
+              <SelectValue placeholder={t("grade.select") || "Select grade"} />
+            </SelectTrigger>
+            <SelectContent>
+              {GRADES.map((g) => (
+                <SelectItem key={g.value} value={g.value}>
+                  {language === "ar" ? g.labelAr : g.labelEn}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="flex flex-wrap gap-4 items-end">
           <div className="space-y-2">
             <Label className="flex items-center gap-2"><Clock className="h-4 w-4" />{t("quiz.timeLimit")}</Label>
