@@ -121,6 +121,7 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
           title,
           description,
           category: category as any,
+          grade: grade || null,
           video_url: videoUrl,
           thumbnail_url: thumbnailUrl,
           teacher_id: user.id,
