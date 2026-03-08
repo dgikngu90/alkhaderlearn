@@ -28,7 +28,7 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
-  const categories = ["عربي", "English", "علوم حياتية", "كيمياء", "علوم ارض", "رياضيات"];
+  const categories = ["عربي", "English", "علوم حياتية", "كيمياء", "علوم ارض", "رياضيات", "مالية"];
 
   const uploadFileWithProgress = async (
     file: File,

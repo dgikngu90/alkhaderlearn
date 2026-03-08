@@ -11,6 +11,7 @@ import biologyBg from "@/assets/category-biology.jpeg";
 import englishBg from "@/assets/category-english.jpeg";
 import chemistryBg from "@/assets/category-chemistry-new.jpeg";
 import mathBg from "@/assets/category-math.jpeg";
+import financeBg from "@/assets/category-finance.jpeg";
 
 const Videos = () => {
   const { t } = useLanguage();
@@ -23,6 +24,7 @@ const Videos = () => {
     { name: "علوم حياتية", image: biologyBg },
     { name: "كيمياء", image: chemistryBg },
     { name: "رياضيات", image: mathBg },
+    { name: "مالية", image: financeBg },
   ];
 
   return (
