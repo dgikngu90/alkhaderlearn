@@ -20,7 +20,7 @@ interface VideoUploadFormProps {
 
 const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [title, setTitle] = useState("");

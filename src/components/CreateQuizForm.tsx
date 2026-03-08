@@ -107,6 +107,7 @@ const CreateQuizForm = ({ user, onQuizCreated }: CreateQuizFormProps) => {
       setTitle("");
       setDescription("");
       setTimeLimitMinutes("");
+      setGrade("");
       setIsPublished(false);
       setQuestions([{ question_text: "", question_type: "multiple_choice", options: ["", "", "", ""], correct_answer: "", points: 1 }]);
       onQuizCreated();
