@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Trophy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -15,6 +15,11 @@ const VideoPlayer = () => {
   const [videoTitle, setVideoTitle] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [watchTime, setWatchTime] = useState<number>(0);
+  const [earnedPoints, setEarnedPoints] = useState<number>(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const watchTimeRef = useRef<number>(0);
 
   useEffect(() => {
     const loadVideo = async () => {
@@ -75,6 +80,73 @@ const VideoPlayer = () => {
     loadVideo();
   }, [videoId]);
 
+  useEffect(() => {
+    const fetchUserAndTrack = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const video = videoRef.current;
+      if (!video) return;
+
+      const handlePlay = () => {
+        timerRef.current = setInterval(async () => {
+          watchTimeRef.current += 1;
+          setWatchTime(watchTimeRef.current);
+          
+          if (watchTimeRef.current % 60 === 0) {
+            const minutes = Math.floor(watchTimeRef.current / 60);
+            await supabase.rpc('add_video_points', { p_user_id: user.id, p_minutes: 1 }).then(({ data }) => {
+              if (data) setEarnedPoints(minutes);
+            }).catch(() => {});
+          }
+        }, 1000);
+      };
+
+      const handlePause = () => {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+      };
+
+      const handleEnded = async () => {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+        const minutes = Math.floor(watchTimeRef.current / 60);
+        if (minutes > 0) {
+          await supabase.rpc('add_video_points', { p_user_id: user.id, p_minutes: minutes }).then(({ data }) => {
+            if (data) setEarnedPoints(minutes);
+          }).catch(() => {});
+        }
+      };
+
+      video.addEventListener('play', handlePlay);
+      video.addEventListener('pause', handlePause);
+      video.addEventListener('ended', handleEnded);
+
+      return () => {
+        video.removeEventListener('play', handlePlay);
+        video.removeEventListener('pause', handlePause);
+        video.removeEventListener('ended', handleEnded);
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+      };
+    };
+
+    fetchUserAndTrack();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -117,6 +189,7 @@ const VideoPlayer = () => {
         <div className="w-full max-w-5xl mx-auto">
           {videoUrl && (
             <video
+              ref={videoRef}
               controls
               autoPlay
               playsInline
@@ -128,6 +201,13 @@ const VideoPlayer = () => {
             </video>
           )}
         </div>
+        
+        {earnedPoints > 0 && (
+          <div className="flex items-center justify-center gap-2 mt-4 text-yellow-400">
+            <Trophy className="h-5 w-5" />
+            <span className="font-bold">+{earnedPoints} {t("score.points") || "points earned!"}</span>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -10,20 +10,12 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { attempt_id, answers: submittedAnswers } = await req.json();
+    const { attempt_id } = await req.json();
     if (!attempt_id) throw new Error("attempt_id is required");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
-
-    // If answers were passed from the client, save them first
-    if (submittedAnswers && Object.keys(submittedAnswers).length > 0) {
-      await supabase
-        .from("quiz_attempts")
-        .update({ answers: submittedAnswers, submitted_at: new Date().toISOString() })
-        .eq("id", attempt_id);
-    }
 
     // Fetch attempt with quiz and questions
     const { data: attempt, error: attemptErr } = await supabase
@@ -51,19 +43,30 @@ serve(async (req) => {
     const answers = attempt.answers as Record<string, string>;
     let totalScore = 0;
     let maxScore = 0;
+    let correctAnswers = 0;
     const details: { question: string; studentAnswer: string; correctAnswer: string; correct: boolean; points: number }[] = [];
 
     for (const q of questions) {
       maxScore += q.points;
       const studentAnswer = answers[q.id] || "";
       const isCorrect = studentAnswer.trim().toLowerCase() === q.correct_answer.trim().toLowerCase();
-      if (isCorrect) totalScore += q.points;
+      if (isCorrect) {
+        totalScore += q.points;
+        correctAnswers += 1;
+      }
       details.push({
         question: q.question_text,
         studentAnswer,
         correctAnswer: q.correct_answer,
         correct: isCorrect,
         points: q.points,
+      });
+    }
+
+    if (correctAnswers > 0) {
+      await supabase.rpc('add_quiz_points', {
+        p_user_id: attempt.student_id,
+        p_correct_answers: correctAnswers
       });
     }
 

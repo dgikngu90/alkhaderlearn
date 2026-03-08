@@ -32,19 +32,22 @@ const TakeQuiz = () => {
     setSubmitting(true);
 
     try {
-      // Save answers first
-      const { error: saveErr } = await supabase
+      console.log("Submitting quiz with answers:", currentAnswers);
+      // Save answers
+      const { error: updateErr } = await supabase
         .from("quiz_attempts")
-        .update({ answers: currentAnswers, submitted_at: new Date().toISOString() })
+        .update({
+          answers: currentAnswers,
+          status: "submitted",
+          submitted_at: new Date().toISOString()
+        })
         .eq("id", currentAttemptId);
 
-      if (saveErr) {
-        console.error("Failed to save answers:", saveErr);
-      }
+      if (updateErr) throw updateErr;
 
-      // Call AI grading (also passes answers as backup)
+      // Call AI grading
       const { data, error } = await supabase.functions.invoke("grade-quiz", {
-        body: { attempt_id: currentAttemptId, answers: currentAnswers },
+        body: { attempt_id: currentAttemptId },
       });
 
       if (error) throw error;
@@ -52,6 +55,7 @@ const TakeQuiz = () => {
       toast({ title: t("success"), description: t("quiz.submitted") });
       navigate(`/quiz-result/${currentAttemptId}`, { replace: true });
     } catch (err: any) {
+      console.error("Submission error:", err);
       toast({ title: t("error"), description: err.message, variant: "destructive" });
       autoSubmitRef.current = false;
       setSubmitting(false);
@@ -81,17 +85,14 @@ const TakeQuiz = () => {
 
       setQuestions(questionsData || []);
 
-      // Check existing in-progress attempt (get latest one)
-      const { data: existingList } = await supabase
+      // Check existing attempt
+      const { data: existing } = await supabase
         .from("quiz_attempts")
         .select("*")
         .eq("quiz_id", quizId)
         .eq("student_id", user.id)
         .eq("status", "in_progress")
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      const existing = existingList?.[0] || null;
+        .maybeSingle();
 
       if (existing) {
         setAttemptId(existing.id);
@@ -103,17 +104,14 @@ const TakeQuiz = () => {
           setTimeLeft(Math.max(0, Math.floor(remaining)));
         }
       } else {
-        // Check if already graded (get latest)
-        const { data: gradedList } = await supabase
+        // Check if already graded
+        const { data: graded } = await supabase
           .from("quiz_attempts")
           .select("id")
           .eq("quiz_id", quizId)
           .eq("student_id", user.id)
           .eq("status", "graded")
-          .order("created_at", { ascending: false })
-          .limit(1);
-
-        const graded = gradedList?.[0] || null;
+          .maybeSingle();
 
         if (graded) {
           navigate(`/quiz-result/${graded.id}`, { replace: true });
@@ -144,12 +142,7 @@ const TakeQuiz = () => {
 
   // Timer
   useEffect(() => {
-    if (timeLeft === null || timeLeft <= 0) {
-      if (timeLeft === 0 && attemptId && !autoSubmitRef.current) {
-        submitQuiz(answers, attemptId);
-      }
-      return;
-    }
+    if (timeLeft === null || timeLeft <= 0) return;
 
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
@@ -162,7 +155,7 @@ const TakeQuiz = () => {
     }, 1000);
 
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [timeLeft !== null, attemptId]);
+  }, [timeLeft !== null]);
 
   // Auto-submit when timer hits 0
   useEffect(() => {
@@ -175,6 +168,28 @@ const TakeQuiz = () => {
   const setAnswer = (questionId: string, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
+
+  // Auto-save answers when they change
+  useEffect(() => {
+    const saveAnswers = async () => {
+      if (!attemptId || Object.keys(answers).length === 0 || submitting) return;
+
+      try {
+        await supabase
+          .from("quiz_attempts")
+          .update({ answers })
+          .eq("id", attemptId);
+      } catch (err) {
+        console.error("Auto-save error:", err);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      saveAnswers();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [answers, attemptId]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -254,9 +269,8 @@ const TakeQuiz = () => {
 const Badge = ({ timeLeft, formatTime }: { timeLeft: number; formatTime: (s: number) => string }) => {
   const isUrgent = timeLeft < 60;
   return (
-    <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-mono font-bold ${
-      isUrgent ? "bg-destructive text-destructive-foreground animate-pulse" : "bg-primary/10 text-primary"
-    }`}>
+    <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-mono font-bold ${isUrgent ? "bg-destructive text-destructive-foreground animate-pulse" : "bg-primary/10 text-primary"
+      }`}>
       <Clock className="h-4 w-4" />
       {formatTime(timeLeft)}
     </div>

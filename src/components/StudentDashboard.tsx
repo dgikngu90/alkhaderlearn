@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Video, CheckCircle, Zap, Star, BookOpen, Phone, Download, ClipboardList } from "lucide-react";
+import { Video, CheckCircle, Zap, Star, BookOpen, Phone, Download, ClipboardList, Megaphone, Bell } from "lucide-react";
 import VideoList from "./VideoList";
 import StudyAssistantChat from "./StudyAssistantChat";
 import StudentQuizList from "./StudentQuizList";
 import BottomNavigation from "./BottomNavigation";
+import CourseProgress from "./CourseProgress";
+import Scoreboard from "./Scoreboard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import arabicBg from "@/assets/category-arabic.jpeg";
 import biologyBg from "@/assets/category-biology.jpeg";
 import englishBg from "@/assets/category-english.jpeg";
@@ -21,6 +25,21 @@ interface StudentDashboardProps {
 const StudentDashboard = ({ user }: StudentDashboardProps) => {
   const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      const { data } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("is_broadcast", true)
+        .order("created_at", { ascending: false })
+        .limit(3);
+
+      if (data) setAnnouncements(data);
+    };
+    fetchAnnouncements();
+  }, []);
 
   const categories = [
     { name: "عربي", image: arabicBg },
@@ -44,7 +63,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-background relative"
       style={getCategoryBackground() ? {
         backgroundImage: `url(${getCategoryBackground()})`,
@@ -56,22 +75,56 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
       {getCategoryBackground() && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm -z-10" />
       )}
-      
+
       <div className="relative z-10 pb-20">
 
         {/* Hero Section */}
         <section
           id="hero"
-          className="min-h-[90vh] flex flex-col items-center justify-center px-4 py-20 relative overflow-hidden"
+          className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden"
         >
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
-          
+
           <div className="max-w-4xl mx-auto text-center space-y-8 relative stagger-children">
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold gradient-text leading-tight">
+            {announcements.length > 0 && (
+              <div className="mb-8 animate-in fade-in zoom-in duration-1000">
+                <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1 mb-4 text-primary text-sm font-medium">
+                  <Megaphone className="h-4 w-4" />
+                  {t("broadcast")}
+                </div>
+                <div className="glass border-primary/20 rounded-2xl p-4 max-w-2xl mx-auto flex items-center gap-4 relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-primary/5 group-hover:bg-primary/10 transition-colors" />
+                  <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
+                    <Bell className="h-6 w-6 text-primary animate-ring" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <h4 className="font-bold text-foreground">{announcements[0].title}</h4>
+                    <p className="text-sm text-muted-foreground line-clamp-1">{announcements[0].content}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" className="hidden sm:flex" onClick={() => handleScrollTo("assistant")}>
+                    {t("video.watch")}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {user && (
+              <div className="w-full max-w-sm mx-auto mb-8 animate-in fade-in slide-in-from-top-4 duration-1000 delay-200">
+                <CourseProgress userId={user.id} />
+              </div>
+            )}
+
+            {user && (
+              <div className="w-full max-w-sm mx-auto mb-8 animate-in fade-in slide-in-from-top-4 duration-1000 delay-300">
+                <Scoreboard user={user} />
+              </div>
+            )}
+
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold gradient-text leading-tight drop-shadow-sm">
               {t("landing.title")}
             </h1>
-            
+
             <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
               {t("landing.subtitle")}
             </p>
@@ -109,8 +162,8 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
             </div>
 
             <div className="pt-8 flex flex-col items-center gap-6">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 asChild
                 className="px-8 py-6 text-lg rounded-full glow press-effect animate-pulse-glow"
               >
@@ -169,11 +222,10 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                   <button
                     onClick={() => setSelectedCategory("all")}
-                    className={`relative h-20 sm:h-24 rounded-xl overflow-hidden transition-all duration-300 press-effect ${
-                      selectedCategory === "all" 
-                        ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-glow scale-105" 
-                        : "hover:scale-102"
-                    }`}
+                    className={`relative h-20 sm:h-24 rounded-xl overflow-hidden transition-all duration-300 press-effect ${selectedCategory === "all"
+                      ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-glow scale-105"
+                      : "hover:scale-102"
+                      }`}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                       <span className="text-primary-foreground font-bold text-sm sm:text-base">{t("student.all.categories")}</span>
@@ -183,15 +235,14 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
                     <button
                       key={cat.name}
                       onClick={() => setSelectedCategory(cat.name)}
-                      className={`relative h-20 sm:h-24 rounded-xl overflow-hidden transition-all duration-300 press-effect ${
-                        selectedCategory === cat.name 
-                          ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-glow scale-105" 
-                          : "hover:scale-102"
-                      }`}
+                      className={`relative h-20 sm:h-24 rounded-xl overflow-hidden transition-all duration-300 press-effect ${selectedCategory === cat.name
+                        ? "ring-2 ring-primary ring-offset-2 ring-offset-background shadow-glow scale-105"
+                        : "hover:scale-102"
+                        }`}
                     >
-                      <img 
-                        src={cat.image} 
-                        alt={cat.name} 
+                      <img
+                        src={cat.image}
+                        alt={cat.name}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end justify-center pb-2">
@@ -201,9 +252,9 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
                   ))}
                 </div>
               </div>
-              <VideoList 
-                userId={user?.id} 
-                isTeacher={false} 
+              <VideoList
+                userId={user?.id}
+                isTeacher={false}
                 selectedCategory={selectedCategory === "all" ? undefined : selectedCategory}
               />
             </CardContent>
@@ -238,8 +289,8 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-3">{t("landing.contact.desc")}</p>
-              <a 
-                href="tel:0788212294" 
+              <a
+                href="tel:0788212294"
                 className="text-xl font-bold gradient-text underline-animate"
               >
                 0788212294

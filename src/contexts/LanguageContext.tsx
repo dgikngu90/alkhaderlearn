@@ -93,6 +93,12 @@ const translations = {
     "arabic": "Arabic",
     "error": "Error",
     
+    // Scoreboard
+    "score.points": "points earned!",
+    "score.total": "Total Points",
+    "score.watchTime": "Watch Time (min)",
+    "score.correctAnswers": "Correct Answers",
+    
     // Premium Dialog
     "premium.title": "Upgrade to Premium",
     "premium.desc": "Unlock unlimited access to all educational content",
@@ -209,11 +215,6 @@ const translations = {
     "quiz.aiFeedback": "AI Feedback",
     "quiz.yourAnswer": "Your answer",
     "quiz.noAnswer": "no answer",
-    "quiz.clickCorrect": "Click the circle to mark the correct answer",
-    "quiz.markCorrect": "Mark as correct",
-    "quiz.studentResults": "Student Results",
-    "quiz.noSubmissions": "No submissions yet",
-    "quiz.viewStudentResults": "View student results",
   },
   ar: {
     // Landing Page
@@ -298,6 +299,12 @@ const translations = {
     "english": "الإنجليزية",
     "arabic": "العربية",
     "error": "خطأ",
+    
+    // Scoreboard
+    "score.points": "نقاط مكتسبة!",
+    "score.total": "إجمالي النقاط",
+    "score.watchTime": "وقت المشاهدة (دقيقة)",
+    "score.correctAnswers": "الإجابات الصحيحة",
     
     // Premium Dialog
     "premium.title": "الترقية إلى المميز",
@@ -415,11 +422,6 @@ const translations = {
     "quiz.aiFeedback": "ملاحظات الذكاء الاصطناعي",
     "quiz.yourAnswer": "إجابتك",
     "quiz.noAnswer": "بدون إجابة",
-    "quiz.clickCorrect": "اضغط على الدائرة لتحديد الإجابة الصحيحة",
-    "quiz.markCorrect": "تحديد كإجابة صحيحة",
-    "quiz.studentResults": "نتائج الطلاب",
-    "quiz.noSubmissions": "لا توجد إجابات بعد",
-    "quiz.viewStudentResults": "عرض نتائج الطلاب",
   },
 };
 

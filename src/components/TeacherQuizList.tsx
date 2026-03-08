@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Trash2, Eye, EyeOff, Clock, Users, BarChart3 } from "lucide-react";
-import TeacherQuizResults from "./TeacherQuizResults";
+import { Trash2, Eye, EyeOff, Clock, Users } from "lucide-react";
 
 interface TeacherQuizListProps {
   user: User;
@@ -20,7 +19,6 @@ const TeacherQuizList = ({ user, refreshKey }: TeacherQuizListProps) => {
   const [quizzes, setQuizzes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [attemptCounts, setAttemptCounts] = useState<Record<string, number>>({});
-  const [viewingQuiz, setViewingQuiz] = useState<{ id: string; title: string } | null>(null);
 
   const fetchQuizzes = async () => {
     setLoading(true);
@@ -75,11 +73,7 @@ const TeacherQuizList = ({ user, refreshKey }: TeacherQuizListProps) => {
   };
 
   if (loading) return <p className="text-muted-foreground">{t("loading")}</p>;
-  if (quizzes.length === 0 && !viewingQuiz) return <p className="text-muted-foreground">{t("quiz.noQuizzes")}</p>;
-
-  if (viewingQuiz) {
-    return <TeacherQuizResults quizId={viewingQuiz.id} quizTitle={viewingQuiz.title} onBack={() => setViewingQuiz(null)} />;
-  }
+  if (quizzes.length === 0) return <p className="text-muted-foreground">{t("quiz.noQuizzes")}</p>;
 
   return (
     <div className="space-y-3">
@@ -105,9 +99,6 @@ const TeacherQuizList = ({ user, refreshKey }: TeacherQuizListProps) => {
                 </div>
               </div>
               <div className="flex gap-1">
-                <Button variant="ghost" size="icon" onClick={() => setViewingQuiz({ id: quiz.id, title: quiz.title })} title={t("quiz.viewStudentResults")}>
-                  <BarChart3 className="h-4 w-4" />
-                </Button>
                 <Button variant="ghost" size="icon" onClick={() => togglePublish(quiz.id, quiz.is_published)}>
                   {quiz.is_published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
