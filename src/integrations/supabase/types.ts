@@ -378,6 +378,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_scores: {
+        Row: {
+          id: string
+          quiz_correct_answers: number
+          total_points: number
+          updated_at: string
+          user_id: string
+          video_watch_time_minutes: number
+        }
+        Insert: {
+          id?: string
+          quiz_correct_answers?: number
+          total_points?: number
+          updated_at?: string
+          user_id: string
+          video_watch_time_minutes?: number
+        }
+        Update: {
+          id?: string
+          quiz_correct_answers?: number
+          total_points?: number
+          updated_at?: string
+          user_id?: string
+          video_watch_time_minutes?: number
+        }
+        Relationships: []
+      }
       video_views: {
         Row: {
           id: string
@@ -460,6 +487,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_points: {
+        Args: {
+          p_correct_answers?: number
+          p_points: number
+          p_user_id: string
+          p_watch_minutes?: number
+        }
+        Returns: undefined
+      }
       assign_user_role: {
         Args: {
           p_role: Database["public"]["Enums"]["app_role"]
