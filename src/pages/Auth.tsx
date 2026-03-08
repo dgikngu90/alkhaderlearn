@@ -144,6 +144,11 @@ const Auth = () => {
       if (data.user) {
         await registerRole(data.user.id, role);
 
+        // Save grade to profile if student
+        if (role === "student" && grade) {
+          await supabase.from("profiles").update({ grade } as any).eq("id", data.user.id);
+        }
+
         setShowEmailVerification(true);
         toast({
           title: "Account created!",
