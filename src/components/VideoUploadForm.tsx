@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { GRADES } from "@/constants/grades";
 
 interface VideoUploadFormProps {
   user: User;
