@@ -82,8 +82,9 @@ const CreateQuizForm = ({ user, onQuizCreated }: CreateQuizFormProps) => {
           title: title.trim(),
           description: description.trim() || null,
           time_limit_minutes: timeLimitMinutes || null,
+          grade: grade || null,
           is_published: isPublished,
-        })
+        } as any)
         .select()
         .single();
 
