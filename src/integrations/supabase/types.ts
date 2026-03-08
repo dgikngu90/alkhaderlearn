@@ -160,6 +160,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string | null
           full_name: string | null
+          grade: Database["public"]["Enums"]["grade_level"] | null
           id: string
           updated_at: string | null
         }
@@ -167,6 +168,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           full_name?: string | null
+          grade?: Database["public"]["Enums"]["grade_level"] | null
           id: string
           updated_at?: string | null
         }
@@ -174,6 +176,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           full_name?: string | null
+          grade?: Database["public"]["Enums"]["grade_level"] | null
           id?: string
           updated_at?: string | null
         }
@@ -278,6 +281,7 @@ export type Database = {
           category: string | null
           created_at: string
           description: string | null
+          grade: Database["public"]["Enums"]["grade_level"] | null
           id: string
           is_published: boolean
           teacher_id: string
@@ -289,6 +293,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           description?: string | null
+          grade?: Database["public"]["Enums"]["grade_level"] | null
           id?: string
           is_published?: boolean
           teacher_id: string
@@ -300,6 +305,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           description?: string | null
+          grade?: Database["public"]["Enums"]["grade_level"] | null
           id?: string
           is_published?: boolean
           teacher_id?: string
@@ -443,6 +449,7 @@ export type Database = {
           created_at: string | null
           description: string | null
           duration: number | null
+          grade: Database["public"]["Enums"]["grade_level"] | null
           id: string
           quality_hd: string | null
           quality_standard: string | null
@@ -457,6 +464,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           duration?: number | null
+          grade?: Database["public"]["Enums"]["grade_level"] | null
           id?: string
           quality_hd?: string | null
           quality_standard?: string | null
@@ -471,6 +479,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           duration?: number | null
+          grade?: Database["public"]["Enums"]["grade_level"] | null
           id?: string
           quality_hd?: string | null
           quality_standard?: string | null
@@ -530,6 +539,13 @@ export type Database = {
     }
     Enums: {
       app_role: "teacher" | "student" | "admin"
+      grade_level:
+        | "الصف السابع"
+        | "الصف الثامن"
+        | "الصف التاسع"
+        | "الصف العاشر"
+        | "الصف الحادي عشر"
+        | "الصف الثاني عشر"
       video_category:
         | "عربي"
         | "English"
@@ -665,6 +681,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["teacher", "student", "admin"],
+      grade_level: [
+        "الصف السابع",
+        "الصف الثامن",
+        "الصف التاسع",
+        "الصف العاشر",
+        "الصف الحادي عشر",
+        "الصف الثاني عشر",
+      ],
       video_category: [
         "عربي",
         "English",
