@@ -428,6 +428,12 @@ const translations = {
     "quiz.aiFeedback": "ملاحظات الذكاء الاصطناعي",
     "quiz.yourAnswer": "إجابتك",
     "quiz.noAnswer": "بدون إجابة",
+    
+    // Grades
+    "grade.label": "الصف",
+    "grade.select": "اختر الصف",
+    "grade.filter": "تصفية حسب الصف",
+    "grade.all": "جميع الصفوف",
   },
 };
 
