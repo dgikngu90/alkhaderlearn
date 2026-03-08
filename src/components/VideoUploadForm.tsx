@@ -117,17 +117,17 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
       // Create video record
       const { error: dbError } = await supabase
         .from("videos")
-        .insert({
+        .insert([{
           title,
           description,
           category: category as any,
-          grade: grade || null,
+          grade: grade as any || null,
           video_url: videoUrl,
           thumbnail_url: thumbnailUrl,
           teacher_id: user.id,
           quality_standard: videoUrl,
           quality_hd: videoUrl,
-        });
+        }]);
 
       if (dbError) throw dbError;
 
