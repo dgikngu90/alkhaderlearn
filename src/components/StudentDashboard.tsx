@@ -289,6 +289,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
                 userId={user?.id}
                 isTeacher={false}
                 selectedCategory={selectedCategory === "all" ? undefined : selectedCategory}
+                selectedGrade={selectedGrade === "all" ? undefined : selectedGrade}
               />
             </CardContent>
           </Card>
