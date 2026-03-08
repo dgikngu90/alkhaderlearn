@@ -30,7 +30,7 @@ interface VideoListProps {
   selectedGrade?: string;
 }
 
-const VideoList = ({ teacherId, userId, isTeacher, selectedCategory }: VideoListProps) => {
+const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, selectedGrade }: VideoListProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
