@@ -8,9 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { GraduationCap, UserCircle, ArrowLeft, Mail } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { GRADES } from "@/constants/grades";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -20,6 +22,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<"student" | "teacher">("student");
+  const [grade, setGrade] = useState<string>("");
   const [inviteCode, setInviteCode] = useState("");
   const [showEmailVerification, setShowEmailVerification] = useState(false);
 
@@ -140,6 +143,11 @@ const Auth = () => {
 
       if (data.user) {
         await registerRole(data.user.id, role);
+
+        // Save grade to profile if student
+        if (role === "student" && grade) {
+          await supabase.from("profiles").update({ grade } as any).eq("id", data.user.id);
+        }
 
         setShowEmailVerification(true);
         toast({
@@ -410,6 +418,24 @@ const Auth = () => {
                     </div>
                   </RadioGroup>
                 </div>
+
+                {role === "student" && (
+                  <div className="space-y-2 animate-fade-in">
+                    <Label htmlFor="grade">Grade / الصف</Label>
+                    <Select value={grade} onValueChange={setGrade}>
+                      <SelectTrigger className="bg-background/50">
+                        <SelectValue placeholder="Select your grade / اختر صفك" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {GRADES.map((g) => (
+                          <SelectItem key={g.value} value={g.value}>
+                            {g.labelEn} - {g.labelAr}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 {role === "teacher" && (
                   <div className="space-y-2 animate-fade-in">

@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { GRADES } from "@/constants/grades";
 
 interface VideoUploadFormProps {
   user: User;
@@ -19,12 +20,13 @@ interface VideoUploadFormProps {
 
 const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<string>("عربي");
+  const [grade, setGrade] = useState<string>("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
@@ -119,6 +121,7 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
           title,
           description,
           category: category as any,
+          grade: grade || null,
           video_url: videoUrl,
           thumbnail_url: thumbnailUrl,
           teacher_id: user.id,
@@ -139,6 +142,7 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
       setTitle("");
       setDescription("");
       setCategory("عربي");
+      setGrade("");
       setVideoFile(null);
       setThumbnailFile(null);
       setUploadProgress(0);
@@ -200,6 +204,22 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
                 {categories.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="grade">{t("grade.label") || "Grade"}</Label>
+            <Select value={grade} onValueChange={setGrade} disabled={uploading}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("grade.select") || "Select grade"} />
+              </SelectTrigger>
+              <SelectContent>
+                {GRADES.map((g) => (
+                  <SelectItem key={g.value} value={g.value}>
+                    {language === "ar" ? g.labelAr : g.labelEn}
                   </SelectItem>
                 ))}
               </SelectContent>

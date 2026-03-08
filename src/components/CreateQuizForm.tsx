@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { GRADES } from "@/constants/grades";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Save, Clock } from "lucide-react";
 
 interface Question {
@@ -25,11 +27,12 @@ interface CreateQuizFormProps {
 }
 
 const CreateQuizForm = ({ user, onQuizCreated }: CreateQuizFormProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { toast } = useToast();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [timeLimitMinutes, setTimeLimitMinutes] = useState<number | "">("");
+  const [grade, setGrade] = useState<string>("");
   const [isPublished, setIsPublished] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([
     { question_text: "", question_type: "multiple_choice", options: ["", "", "", ""], correct_answer: "", points: 1 },
@@ -79,8 +82,9 @@ const CreateQuizForm = ({ user, onQuizCreated }: CreateQuizFormProps) => {
           title: title.trim(),
           description: description.trim() || null,
           time_limit_minutes: timeLimitMinutes || null,
+          grade: grade || null,
           is_published: isPublished,
-        })
+        } as any)
         .select()
         .single();
 
@@ -103,6 +107,7 @@ const CreateQuizForm = ({ user, onQuizCreated }: CreateQuizFormProps) => {
       setTitle("");
       setDescription("");
       setTimeLimitMinutes("");
+      setGrade("");
       setIsPublished(false);
       setQuestions([{ question_text: "", question_type: "multiple_choice", options: ["", "", "", ""], correct_answer: "", points: 1 }]);
       onQuizCreated();
@@ -127,6 +132,22 @@ const CreateQuizForm = ({ user, onQuizCreated }: CreateQuizFormProps) => {
         <div className="space-y-2">
           <Label>{t("quiz.description")}</Label>
           <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder={t("quiz.descriptionPlaceholder")} />
+        </div>
+
+        <div className="space-y-2">
+          <Label>{t("grade.label") || "Grade"}</Label>
+          <Select value={grade} onValueChange={setGrade}>
+            <SelectTrigger>
+              <SelectValue placeholder={t("grade.select") || "Select grade"} />
+            </SelectTrigger>
+            <SelectContent>
+              {GRADES.map((g) => (
+                <SelectItem key={g.value} value={g.value}>
+                  {language === "ar" ? g.labelAr : g.labelEn}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex flex-wrap gap-4 items-end">

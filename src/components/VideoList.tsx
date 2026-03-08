@@ -27,9 +27,10 @@ interface VideoListProps {
   userId?: string;
   isTeacher: boolean;
   selectedCategory?: string;
+  selectedGrade?: string;
 }
 
-const VideoList = ({ teacherId, userId, isTeacher, selectedCategory }: VideoListProps) => {
+const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, selectedGrade }: VideoListProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -47,6 +48,10 @@ const VideoList = ({ teacherId, userId, isTeacher, selectedCategory }: VideoList
 
       if (selectedCategory) {
         query = query.eq("category", selectedCategory as any);
+      }
+
+      if (selectedGrade) {
+        query = query.eq("grade", selectedGrade as any);
       }
 
       const { data, error } = await query;
@@ -110,7 +115,7 @@ const VideoList = ({ teacherId, userId, isTeacher, selectedCategory }: VideoList
 
   useEffect(() => {
     fetchVideos();
-  }, [teacherId, userId, selectedCategory]);
+  }, [teacherId, userId, selectedCategory, selectedGrade]);
 
   const handleWatch = async (video: Video) => {
     if (!userId) {

@@ -215,6 +215,12 @@ const translations = {
     "quiz.aiFeedback": "AI Feedback",
     "quiz.yourAnswer": "Your answer",
     "quiz.noAnswer": "no answer",
+    
+    // Grades
+    "grade.label": "Grade",
+    "grade.select": "Select grade",
+    "grade.filter": "Filter by Grade",
+    "grade.all": "All Grades",
   },
   ar: {
     // Landing Page
@@ -422,6 +428,12 @@ const translations = {
     "quiz.aiFeedback": "ملاحظات الذكاء الاصطناعي",
     "quiz.yourAnswer": "إجابتك",
     "quiz.noAnswer": "بدون إجابة",
+    
+    // Grades
+    "grade.label": "الصف",
+    "grade.select": "اختر الصف",
+    "grade.filter": "تصفية حسب الصف",
+    "grade.all": "جميع الصفوف",
   },
 };
 
