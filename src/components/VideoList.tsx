@@ -50,6 +50,10 @@ const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, selectedGra
         query = query.eq("category", selectedCategory as any);
       }
 
+      if (selectedGrade) {
+        query = query.eq("grade", selectedGrade as any);
+      }
+
       const { data, error } = await query;
 
       if (error) throw error;
