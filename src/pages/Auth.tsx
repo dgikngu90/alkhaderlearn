@@ -22,6 +22,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<"student" | "teacher">("student");
+  const [grade, setGrade] = useState<string>("");
   const [inviteCode, setInviteCode] = useState("");
   const [showEmailVerification, setShowEmailVerification] = useState(false);
 
