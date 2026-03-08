@@ -142,6 +142,7 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
       setTitle("");
       setDescription("");
       setCategory("عربي");
+      setGrade("");
       setVideoFile(null);
       setThumbnailFile(null);
       setUploadProgress(0);
