@@ -26,6 +26,7 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<string>("عربي");
+  const [grade, setGrade] = useState<string>("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
