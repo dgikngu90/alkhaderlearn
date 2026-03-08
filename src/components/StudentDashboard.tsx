@@ -10,6 +10,7 @@ import BottomNavigation from "./BottomNavigation";
 import CourseProgress from "./CourseProgress";
 import Scoreboard from "./Scoreboard";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { GRADES } from "@/constants/grades";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import arabicBg from "@/assets/category-arabic.jpeg";
