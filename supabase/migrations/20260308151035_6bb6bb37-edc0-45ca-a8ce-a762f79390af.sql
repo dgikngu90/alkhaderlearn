@@ -1,0 +1,1 @@
+ALTER TYPE public.video_category ADD VALUE 'مالية';
