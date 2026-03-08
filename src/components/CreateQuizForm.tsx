@@ -32,6 +32,7 @@ const CreateQuizForm = ({ user, onQuizCreated }: CreateQuizFormProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [timeLimitMinutes, setTimeLimitMinutes] = useState<number | "">("");
+  const [grade, setGrade] = useState<string>("");
   const [isPublished, setIsPublished] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([
     { question_text: "", question_type: "multiple_choice", options: ["", "", "", ""], correct_answer: "", points: 1 },
