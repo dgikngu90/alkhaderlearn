@@ -215,6 +215,12 @@ const translations = {
     "quiz.aiFeedback": "AI Feedback",
     "quiz.yourAnswer": "Your answer",
     "quiz.noAnswer": "no answer",
+    
+    // Grades
+    "grade.label": "Grade",
+    "grade.select": "Select grade",
+    "grade.filter": "Filter by Grade",
+    "grade.all": "All Grades",
   },
   ar: {
     // Landing Page
