@@ -95,9 +95,7 @@ const VideoPlayer = () => {
           
           if (watchTimeRef.current % 60 === 0) {
             const minutes = Math.floor(watchTimeRef.current / 60);
-            await supabase.rpc('add_video_points', { p_user_id: user.id, p_minutes: 1 }).then(({ data }) => {
-              if (data) setEarnedPoints(minutes);
-            }).catch(() => {});
+            setEarnedPoints(minutes);
           }
         }, 1000);
       };
