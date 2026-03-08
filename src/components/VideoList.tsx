@@ -115,7 +115,7 @@ const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, selectedGra
 
   useEffect(() => {
     fetchVideos();
-  }, [teacherId, userId, selectedCategory]);
+  }, [teacherId, userId, selectedCategory, selectedGrade]);
 
   const handleWatch = async (video: Video) => {
     if (!userId) {
