@@ -221,6 +221,35 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
               <CardDescription>{t("student.videos.desc")}</CardDescription>
             </CardHeader>
             <CardContent>
+              {/* Grade Filter */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-4">{t("grade.filter") || "Filter by Grade"}</h3>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedGrade("all")}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedGrade === "all"
+                      ? "bg-primary text-primary-foreground shadow-glow"
+                      : "bg-muted hover:bg-muted/80"
+                    }`}
+                  >
+                    {t("student.all.categories")}
+                  </button>
+                  {GRADES.map((g) => (
+                    <button
+                      key={g.value}
+                      onClick={() => setSelectedGrade(g.value)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedGrade === g.value
+                        ? "bg-primary text-primary-foreground shadow-glow"
+                        : "bg-muted hover:bg-muted/80"
+                      }`}
+                    >
+                      {language === "ar" ? g.labelAr : g.labelEn}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Category Filter */}
               <div className="mb-8">
                 <h3 className="text-lg font-semibold mb-4">{t("student.filter")}</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
