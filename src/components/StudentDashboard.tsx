@@ -25,8 +25,9 @@ interface StudentDashboardProps {
 }
 
 const StudentDashboard = ({ user }: StudentDashboardProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedGrade, setSelectedGrade] = useState<string>("all");
   const [announcements, setAnnouncements] = useState<any[]>([]);
 
   useEffect(() => {
