@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
@@ -22,6 +22,24 @@ const Auth = () => {
   const [role, setRole] = useState<"student" | "teacher">("student");
   const [inviteCode, setInviteCode] = useState("");
   const [showEmailVerification, setShowEmailVerification] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!isMounted) return;
+      if (session?.user) navigate("/dashboard");
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) navigate("/dashboard");
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   const signUpSchema = z.object({
     email: z.string().email("Invalid email address").max(255, "Email too long"),
@@ -51,6 +69,25 @@ const Auth = () => {
     if (error) {
       throw new Error("Could not assign your role during signup. Please try again.");
     }
+  };
+
+  const signInWithTimeout = async (loginEmail: string, loginPassword: string) => {
+    return new Promise<Awaited<ReturnType<typeof supabase.auth.signInWithPassword>>>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error("Sign-in timed out. Please check your internet connection and try again."));
+      }, 15000);
+
+      supabase.auth
+        .signInWithPassword({ email: loginEmail, password: loginPassword })
+        .then((result) => {
+          clearTimeout(timeout);
+          resolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timeout);
+          reject(error);
+        });
+    });
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -146,10 +183,7 @@ const Auth = () => {
         }
       }
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: loginPassword,
-      });
+      const { data, error } = await signInWithTimeout(loginEmail, loginPassword);
 
       if (error) {
         if (error.message?.includes('Email not confirmed')) {
@@ -164,13 +198,15 @@ const Auth = () => {
       }
 
       if (data.user) {
-        const { data: banCheck } = await supabase
-          .from('banned_users')
-          .select('id')
-          .eq('user_id', data.user.id)
-          .maybeSingle();
-        
-        if (banCheck) {
+        const { data: isBanned, error: banError } = await supabase.rpc('is_user_banned', {
+          user_id: data.user.id,
+        });
+
+        if (banError && import.meta.env.DEV) {
+          console.error("Ban check failed:", banError);
+        }
+
+        if (isBanned) {
           await supabase.auth.signOut();
           throw new Error("Your account has been banned. Please contact support.");
         }
@@ -421,3 +457,4 @@ const Auth = () => {
 };
 
 export default Auth;
+
