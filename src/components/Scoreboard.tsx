@@ -27,13 +27,11 @@ const Scoreboard = ({ user }: ScoreboardProps) => {
         return;
       }
 
-      // user_scores table doesn't exist yet, use defaults
       setScore({
-          total_points: 0,
-          video_watch_time_minutes: 0,
-          quiz_correct_answers: 0
-        });
-      }
+        total_points: 0,
+        video_watch_time_minutes: 0,
+        quiz_correct_answers: 0
+      });
       setLoading(false);
     };
 
