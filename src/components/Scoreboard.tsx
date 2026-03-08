@@ -27,21 +27,11 @@ const Scoreboard = ({ user }: ScoreboardProps) => {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("user_scores")
-        .select("total_points, video_watch_time_minutes, quiz_correct_answers")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!error && data) {
-        setScore(data);
-      } else {
-        setScore({
-          total_points: 0,
-          video_watch_time_minutes: 0,
-          quiz_correct_answers: 0
-        });
-      }
+      setScore({
+        total_points: 0,
+        video_watch_time_minutes: 0,
+        quiz_correct_answers: 0
+      });
       setLoading(false);
     };
 
