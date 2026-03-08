@@ -419,6 +419,24 @@ const Auth = () => {
                   </RadioGroup>
                 </div>
 
+                {role === "student" && (
+                  <div className="space-y-2 animate-fade-in">
+                    <Label htmlFor="grade">Grade / الصف</Label>
+                    <Select value={grade} onValueChange={setGrade}>
+                      <SelectTrigger className="bg-background/50">
+                        <SelectValue placeholder="Select your grade / اختر صفك" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {GRADES.map((g) => (
+                          <SelectItem key={g.value} value={g.value}>
+                            {g.labelEn} - {g.labelAr}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 {role === "teacher" && (
                   <div className="space-y-2 animate-fade-in">
                     <Label htmlFor="invite-code">Teacher Invite Code</Label>
