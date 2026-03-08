@@ -115,6 +115,20 @@ const VideoPlayer = () => {
         const minutes = Math.floor(watchTimeRef.current / 60);
         if (minutes > 0) {
           setEarnedPoints(minutes);
+          // Save watch time points to database
+          try {
+            const { data: { user: currentUser } } = await supabase.auth.getUser();
+            if (currentUser) {
+              await supabase.rpc("add_points", {
+                p_user_id: currentUser.id,
+                p_points: minutes,
+                p_correct_answers: 0,
+                p_watch_minutes: minutes,
+              });
+            }
+          } catch (err) {
+            console.error("Failed to save watch points:", err);
+          }
         }
       };
 
