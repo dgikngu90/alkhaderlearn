@@ -27,7 +27,7 @@ interface CreateQuizFormProps {
 }
 
 const CreateQuizForm = ({ user, onQuizCreated }: CreateQuizFormProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { toast } = useToast();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
