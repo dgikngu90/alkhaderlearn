@@ -63,7 +63,16 @@ serve(async (req) => {
       });
     }
 
-    // Points tracking could be added here in the future
+    // Award points: 10 per correct answer
+    if (correctAnswers > 0) {
+      const pointsToAdd = correctAnswers * 10;
+      await supabase.rpc("add_points", {
+        p_user_id: attempt.student_id,
+        p_points: pointsToAdd,
+        p_correct_answers: correctAnswers,
+        p_watch_minutes: 0,
+      });
+    }
 
     // Use AI for feedback on text answers
     let aiFeedback = "";
