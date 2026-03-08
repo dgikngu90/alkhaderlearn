@@ -211,6 +211,22 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="grade">{t("grade.label") || "Grade"}</Label>
+            <Select value={grade} onValueChange={setGrade} disabled={uploading}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("grade.select") || "Select grade"} />
+              </SelectTrigger>
+              <SelectContent>
+                {GRADES.map((g) => (
+                  <SelectItem key={g.value} value={g.value}>
+                    {language === "ar" ? g.labelAr : g.labelEn}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="video">Video File</Label>
             <Input
               id="video"
