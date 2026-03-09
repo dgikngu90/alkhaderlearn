@@ -1,0 +1,477 @@
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+
+type Language = "en" | "ar";
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+}
+
+const translations = {
+  en: {
+    // Landing Page
+    "app.title": "Alkhader Learn",
+    "landing.hero.title": "Quality Education at Your Fingertips",
+    "landing.hero.subtitle": "Join our platform where teachers share knowledge and students learn without limits",
+    "landing.hero.cta": "Start Learning Now",
+    "landing.feature.quality.title": "Quality Content",
+    "landing.feature.quality.desc": "Access educational videos uploaded by experienced teachers",
+    "landing.feature.free.title": "Free Access",
+    "landing.feature.free.desc": "Watch videos up to 2 times for free in standard quality",
+    "landing.feature.premium.title": "Premium Benefits",
+    "landing.feature.premium.desc": "Upgrade for unlimited views, downloads, and HD quality (Coming Soon)",
+    "landing.teacher.title": "Are you a teacher?",
+    "landing.teacher.desc": "Share your knowledge with students around Jordan. Upload videos and help students succeed.",
+    "landing.teacher.cta": "Sign Up as Teacher",
+    "landing.creators": "Creators",
+    "get.started": "Get Started",
+    
+    // Dashboard
+    "dashboard.signout": "Sign Out",
+    "dashboard.loading": "Loading...",
+    "dashboard.title": "Dashboard",
+    
+    // Settings
+    "settings.title": "Settings",
+    "settings.language": "Language",
+    "settings.language.desc": "Choose your preferred language",
+    "settings.back": "Back to Dashboard",
+    "settings.darkMode": "Dark Mode",
+    "settings.darkMode.desc": "Switch between light and dark theme",
+    
+    // Student Dashboard
+    "student.videos": "Available Videos",
+    "student.videos.desc": "Browse and watch educational content",
+    "student.filter": "Filter by Category",
+    "student.all.categories": "All Categories",
+    "student.nav.hero": "Overview",
+    "student.nav.subscription": "Subscription",
+    "student.nav.assistant": "AI Assistant",
+    "student.nav.videos": "Videos",
+    "student.nav.about": "About",
+    "student.nav.contact": "Contact",
+    "quiz.nav": "Quizzes",
+    
+    // Subscription
+    "subscription.title": "Premium Subscription",
+    "subscription.active": "You have unlimited access to all videos",
+    "subscription.upgrade": "Upgrade to watch unlimited videos",
+    "subscription.active.badge": "Active Premium Subscription",
+     "subscription.benefit.unlimited": "Unlimited video views",
+     "subscription.benefit.hd": "HD quality streaming",
+     "subscription.benefit.noads": "No ads",
+     "subscription.benefit.ai": "Unlimited AI study assistant questions",
+     "subscription.price": "Price: 1 JOD/month",
+    
+    // Video List
+    "video.loading": "Loading videos...",
+    "video.none.teacher": "No videos uploaded yet",
+    "video.none.student": "No videos available",
+    "video.views": "views",
+    "video.watch": "Watch",
+    "video.limit": "Limit Reached",
+    "video.upgrade": "Upgrade to Premium for unlimited views",
+    "video.delete.confirm": "Are you sure you want to delete this video?",
+    "video.deleted": "Video deleted",
+    "video.deleted.desc": "The video has been removed successfully",
+    
+    // Teacher Dashboard
+    "teacher.upload": "Upload New Video",
+    "teacher.upload.desc": "Share your knowledge with students",
+    "teacher.videos": "My Videos",
+    "teacher.videos.desc": "Manage your uploaded content",
+    "teacher.title.label": "Video Title",
+    "teacher.description.label": "Description",
+    "teacher.category.label": "Category",
+    "teacher.video.label": "Video File",
+    "teacher.thumbnail.label": "Thumbnail Image (optional)",
+    "teacher.upload.button": "Upload Video",
+    "teacher.uploading": "Uploading...",
+    
+    // Common
+    "english": "English",
+    "arabic": "Arabic",
+    "error": "Error",
+    
+    // Scoreboard
+    "score.points": "points earned!",
+    "score.total": "Total Points",
+    "score.watchTime": "Watch Time (min)",
+    "score.correctAnswers": "Correct Answers",
+    
+    // Premium Dialog
+    "premium.title": "Upgrade to Premium",
+    "premium.desc": "Unlock unlimited access to all educational content",
+     "premium.feature.unlimited": "Unlimited Video Views",
+     "premium.feature.unlimited.desc": "Watch any video as many times as you want",
+     "premium.feature.hd": "HD Quality Streaming",
+     "premium.feature.hd.desc": "Access high-quality video content",
+     "premium.feature.exclusive": "No Restrictions",
+     "premium.feature.exclusive.desc": "Full access to all categories and content",
+     "premium.feature.ai": "Unlimited AI Study Assistant",
+     "premium.feature.ai.desc": "Ask the AI study assistant unlimited questions every day",
+    "premium.price.desc": "Cancel anytime, no commitment",
+    "premium.get": "Get Premium Now",
+    "premium.continue.free": "Continue with Free Plan",
+    "student.scroll.down": "Scroll down to explore categories",
+    "landing.title": "Alkhader Learn",
+    "landing.subtitle": "Quality education at your fingertips - Learn from the best teachers",
+    "landing.quality.title": "Expert Teachers",
+    "landing.quality.desc": "Learn from experienced educators across all subjects",
+    "landing.free.title": "School Contract",
+    "landing.free.desc": "Access content through your school's partnership program",
+    "landing.premium.title": "Premium Access",
+    "landing.premium.desc": "Unlimited views and HD quality for serious learners",
+    "landing.about.title": "About Us",
+    "landing.about.desc": "We are a small group trying to make a good project that helps people learn from home",
+    "landing.contact.title": "Contact Us",
+    "landing.contact.desc": "Have questions? Reach out to us!",
+    
+    // Messages
+    "messages": "Messages",
+    "unread": "unread",
+    "back": "Back",
+    "from": "From",
+    "to": "To",
+    "noMessages": "No messages yet",
+    "broadcast": "Announcement",
+    "sendMessage": "Send Message",
+    "broadcastToAll": "Broadcast to all students",
+    "selectStudent": "Select a student",
+    "selectTeacher": "Select a teacher",
+    "messageTitle": "Title",
+    "messageContent": "Message",
+    "messageTitlePlaceholder": "Enter message title",
+    "messageContentPlaceholder": "Enter your message",
+    "enterTitle": "Enter message title",
+    "enterMessage": "Enter your message",
+    "sending": "Sending...",
+    "send": "Send",
+    "success": "Success",
+    "messageSent": "Message sent successfully",
+    "messageFailed": "Failed to send message",
+    "fillAllFields": "Please fill all required fields",
+    "selectRecipient": "Please select a recipient",
+    "sendToTeacher": "Send to Teacher",
+    "sendMessageToTeacher": "Send a message to your teacher",
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "allStudents": "All Students",
+    "unknown": "Unknown",
+    "loading": "Loading...",
+    "failedToLoadMessages": "Failed to load messages",
+
+    // Quiz
+    "quiz.section": "Quizzes",
+    "quiz.sectionDesc": "Create and manage quizzes for your students",
+    "quiz.create": "Create New Quiz",
+    "quiz.title": "Quiz Title",
+    "quiz.titlePlaceholder": "Enter quiz title",
+    "quiz.description": "Description",
+    "quiz.descriptionPlaceholder": "Enter quiz description (optional)",
+    "quiz.timeLimit": "Time Limit (minutes)",
+    "quiz.timeLimitPlaceholder": "No limit",
+    "quiz.publish": "Publish immediately",
+    "quiz.questions": "Questions",
+    "quiz.question": "Question",
+    "quiz.questionPlaceholder": "Enter question text",
+    "quiz.type": "Type",
+    "quiz.multipleChoice": "Multiple Choice",
+    "quiz.textAnswer": "Text Answer",
+    "quiz.options": "Options",
+    "quiz.option": "Option",
+    "quiz.correctAnswer": "Correct Answer",
+    "quiz.correctAnswerPlaceholder": "Enter the correct answer",
+    "quiz.points": "Points",
+    "quiz.addQuestion": "Add Question",
+    "quiz.save": "Save Quiz",
+    "quiz.titleRequired": "Please enter a quiz title",
+    "quiz.needQuestions": "Please add at least one question with an answer",
+    "quiz.created": "Quiz created successfully",
+    "quiz.myQuizzes": "My Quizzes",
+    "quiz.noQuizzes": "No quizzes created yet",
+    "quiz.published": "Published",
+    "quiz.unpublished": "Draft",
+    "quiz.draft": "Draft",
+    "quiz.minutes": "min",
+    "quiz.submissions": "submissions",
+    "quiz.deleteConfirm": "Are you sure you want to delete this quiz?",
+    "quiz.deleted": "Quiz deleted",
+    "quiz.available": "Quizzes",
+    "quiz.availableDesc": "Take quizzes from your teachers",
+    "quiz.noQuizzesAvailable": "No quizzes available",
+    "quiz.start": "Start Quiz",
+    "quiz.continue": "Continue",
+    "quiz.viewResults": "View Results",
+    "quiz.submit": "Submit Quiz",
+    "quiz.submitted": "Quiz submitted and graded!",
+    "quiz.timeUp": "Time's Up!",
+    "quiz.autoSubmit": "Your quiz has been auto-submitted",
+    "quiz.typeAnswer": "Type your answer",
+    "quiz.pts": "pts",
+    "quiz.results": "Quiz Results",
+    "quiz.passed": "Great job! You passed!",
+    "quiz.needsImprovement": "Keep studying, you can do better!",
+    "quiz.aiFeedback": "AI Feedback",
+    "quiz.yourAnswer": "Your answer",
+    "quiz.noAnswer": "no answer",
+    
+    // Grades
+    "grade.label": "Grade",
+    "grade.select": "Select grade",
+    "grade.filter": "Filter by Grade",
+    "grade.all": "All Grades",
+  },
+  ar: {
+    // Landing Page
+    "app.title": "الخضر تعلم",
+    "landing.hero.title": "تعليم عالي الجودة في متناول يدك",
+    "landing.hero.subtitle": "انضم إلى منصتنا حيث يشارك المعلمون المعرفة ويتعلم الطلاب بلا حدود",
+    "landing.hero.cta": "ابدأ التعلم الآن",
+    "landing.feature.quality.title": "محتوى عالي الجودة",
+    "landing.feature.quality.desc": "الوصول إلى مقاطع الفيديو التعليمية التي يحملها معلمون ذوو خبرة",
+    "landing.feature.free.title": "وصول مجاني",
+    "landing.feature.free.desc": "شاهد الفيديوهات حتى مرتين مجانًا بجودة قياسية",
+    "landing.feature.premium.title": "مزايا مميزة",
+    "landing.feature.premium.desc": "قم بالترقية للحصول على مشاهدات غير محدودة وتنزيلات وجودة عالية (قريبًا)",
+    "landing.teacher.title": "هل أنت معلم؟",
+    "landing.teacher.desc": "شارك معرفتك مع الطلاب في جميع أنحاء الأردن. قم برفع الفيديوهات وساعد الطلاب على النجاح.",
+    "landing.teacher.cta": "التسجيل كمعلم",
+    "landing.creators": "المبدعون",
+    "get.started": "ابدأ الآن",
+    
+    // Dashboard
+    "dashboard.signout": "تسجيل الخروج",
+    "dashboard.loading": "جاري التحميل...",
+    "dashboard.title": "لوحة التحكم",
+    
+    // Settings
+    "settings.title": "الإعدادات",
+    "settings.language": "اللغة",
+    "settings.language.desc": "اختر لغتك المفضلة",
+    "settings.back": "العودة إلى لوحة التحكم",
+    "settings.darkMode": "الوضع الداكن",
+    "settings.darkMode.desc": "التبديل بين المظهر الفاتح والداكن",
+    
+    // Student Dashboard
+    "student.videos": "الفيديوهات المتاحة",
+    "student.videos.desc": "تصفح وشاهد المحتوى التعليمي",
+    "student.filter": "تصفية حسب المادة",
+    "student.all.categories": "جميع المواد",
+    "student.nav.hero": "نظرة عامة",
+    "student.nav.subscription": "الاشتراك",
+    "student.nav.assistant": "المساعد الذكي",
+    "student.nav.videos": "الفيديوهات",
+    "student.nav.about": "من نحن",
+    "student.nav.contact": "تواصل معنا",
+    "quiz.nav": "الاختبارات",
+    
+    // Subscription
+    "subscription.title": "الاشتراك المميز",
+    "subscription.active": "لديك وصول غير محدود لجميع الفيديوهات",
+    "subscription.upgrade": "قم بالترقية لمشاهدة فيديوهات غير محدودة",
+    "subscription.active.badge": "اشتراك مميز نشط",
+     "subscription.benefit.unlimited": "مشاهدات غير محدودة",
+     "subscription.benefit.hd": "جودة عالية",
+     "subscription.benefit.noads": "بدون إعلانات",
+     "subscription.benefit.ai": "أسئلة غير محدودة للمساعد الدراسي بالذكاء الاصطناعي",
+     "subscription.price": "السعر: 1 دينار أردني/شهر",
+    
+    // Video List
+    "video.loading": "جاري تحميل الفيديوهات...",
+    "video.none.teacher": "لم يتم رفع أي فيديوهات بعد",
+    "video.none.student": "لا توجد فيديوهات متاحة",
+    "video.views": "مشاهدة",
+    "video.watch": "شاهد",
+    "video.limit": "تم الوصول للحد الأقصى",
+    "video.upgrade": "قم بالترقية للاشتراك المميز للمشاهدة غير المحدودة",
+    "video.delete.confirm": "هل أنت متأكد من حذف هذا الفيديو؟",
+    "video.deleted": "تم حذف الفيديو",
+    "video.deleted.desc": "تم إزالة الفيديو بنجاح",
+    
+    // Teacher Dashboard
+    "teacher.upload": "رفع فيديو جديد",
+    "teacher.upload.desc": "شارك معرفتك مع الطلاب",
+    "teacher.videos": "فيديوهاتي",
+    "teacher.videos.desc": "إدارة المحتوى المرفوع",
+    "teacher.title.label": "عنوان الفيديو",
+    "teacher.description.label": "الوصف",
+    "teacher.category.label": "المادة",
+    "teacher.video.label": "ملف الفيديو",
+    "teacher.thumbnail.label": "صورة مصغرة (اختياري)",
+    "teacher.upload.button": "رفع الفيديو",
+    "teacher.uploading": "جاري الرفع...",
+    
+    // Common
+    "english": "الإنجليزية",
+    "arabic": "العربية",
+    "error": "خطأ",
+    
+    // Scoreboard
+    "score.points": "نقاط مكتسبة!",
+    "score.total": "إجمالي النقاط",
+    "score.watchTime": "وقت المشاهدة (دقيقة)",
+    "score.correctAnswers": "الإجابات الصحيحة",
+    
+    // Premium Dialog
+    "premium.title": "الترقية إلى المميز",
+    "premium.desc": "احصل على وصول غير محدود لجميع المحتوى التعليمي",
+     "premium.feature.unlimited": "مشاهدات غير محدودة للفيديو",
+     "premium.feature.unlimited.desc": "شاهد أي فيديو عدد المرات التي تريدها",
+     "premium.feature.hd": "بث بجودة عالية",
+     "premium.feature.hd.desc": "الوصول إلى محتوى فيديو عالي الجودة",
+     "premium.feature.exclusive": "بدون قيود",
+     "premium.feature.exclusive.desc": "وصول كامل لجميع الفئات والمحتوى",
+     "premium.feature.ai": "مساعد دراسي بالذكاء الاصطناعي غير محدود",
+     "premium.feature.ai.desc": "اطرح عددًا غير محدود من الأسئلة على المساعد الدراسي كل يوم",
+    "premium.price.desc": "إلغاء في أي وقت، بدون التزام",
+    "premium.get": "احصل على المميز الآن",
+    "premium.continue.free": "متابعة مع الخطة المجانية",
+    "student.scroll.down": "قم بالتمرير لأسفل لاستكشاف الفئات",
+    "landing.title": "الخضر تعلم",
+    "landing.subtitle": "تعليم عالي الجودة في متناول يدك - تعلم من أفضل المعلمين",
+    "landing.quality.title": "معلمون خبراء",
+    "landing.quality.desc": "تعلم من معلمين ذوي خبرة في جميع المواد",
+    "landing.free.title": "عقد المدرسة",
+    "landing.free.desc": "قم بالوصول إلى المحتوى من خلال شراكة مدرستك",
+    "landing.premium.title": "الوصول المميز",
+    "landing.premium.desc": "مشاهدات غير محدودة وجودة عالية للمتعلمين الجادين",
+    "landing.about.title": "من نحن",
+    "landing.about.desc": "نحن مجموعة صغيرة نحاول عمل مشروع جيد يساعد الناس على التعلم من المنزل",
+    "landing.contact.title": "تواصل معنا",
+    "landing.contact.desc": "لديك أسئلة؟ تواصل معنا!",
+    
+    // Messages
+    "messages": "الرسائل",
+    "unread": "غير مقروءة",
+    "back": "رجوع",
+    "from": "من",
+    "to": "إلى",
+    "noMessages": "لا توجد رسائل بعد",
+    "broadcast": "إعلان",
+    "sendMessage": "إرسال رسالة",
+    "broadcastToAll": "إرسال لجميع الطلاب",
+    "selectStudent": "اختر طالب",
+    "selectTeacher": "اختر معلم",
+    "messageTitle": "العنوان",
+    "messageContent": "الرسالة",
+    "messageTitlePlaceholder": "أدخل عنوان الرسالة",
+    "messageContentPlaceholder": "أدخل رسالتك",
+    "enterTitle": "أدخل عنوان الرسالة",
+    "enterMessage": "أدخل رسالتك",
+    "sending": "جاري الإرسال...",
+    "send": "إرسال",
+    "success": "نجاح",
+    "messageSent": "تم إرسال الرسالة بنجاح",
+    "messageFailed": "فشل إرسال الرسالة",
+    "fillAllFields": "يرجى ملء جميع الحقول المطلوبة",
+    "selectRecipient": "يرجى اختيار المستلم",
+    "sendToTeacher": "إرسال للمعلم",
+    "sendMessageToTeacher": "أرسل رسالة إلى معلمك",
+    "inbox": "البريد الوارد",
+    "sent": "المرسلة",
+    "allStudents": "جميع الطلاب",
+    "unknown": "غير معروف",
+    "loading": "جاري التحميل...",
+    "failedToLoadMessages": "فشل تحميل الرسائل",
+
+    // Quiz
+    "quiz.section": "الاختبارات",
+    "quiz.sectionDesc": "إنشاء وإدارة الاختبارات لطلابك",
+    "quiz.create": "إنشاء اختبار جديد",
+    "quiz.title": "عنوان الاختبار",
+    "quiz.titlePlaceholder": "أدخل عنوان الاختبار",
+    "quiz.description": "الوصف",
+    "quiz.descriptionPlaceholder": "أدخل وصف الاختبار (اختياري)",
+    "quiz.timeLimit": "المدة الزمنية (دقائق)",
+    "quiz.timeLimitPlaceholder": "بدون حد",
+    "quiz.publish": "نشر فوراً",
+    "quiz.questions": "الأسئلة",
+    "quiz.question": "السؤال",
+    "quiz.questionPlaceholder": "أدخل نص السؤال",
+    "quiz.type": "النوع",
+    "quiz.multipleChoice": "اختيار متعدد",
+    "quiz.textAnswer": "إجابة نصية",
+    "quiz.options": "الخيارات",
+    "quiz.option": "الخيار",
+    "quiz.correctAnswer": "الإجابة الصحيحة",
+    "quiz.correctAnswerPlaceholder": "أدخل الإجابة الصحيحة",
+    "quiz.points": "النقاط",
+    "quiz.addQuestion": "إضافة سؤال",
+    "quiz.save": "حفظ الاختبار",
+    "quiz.titleRequired": "يرجى إدخال عنوان الاختبار",
+    "quiz.needQuestions": "يرجى إضافة سؤال واحد على الأقل مع إجابة",
+    "quiz.created": "تم إنشاء الاختبار بنجاح",
+    "quiz.myQuizzes": "اختباراتي",
+    "quiz.noQuizzes": "لم يتم إنشاء اختبارات بعد",
+    "quiz.published": "منشور",
+    "quiz.unpublished": "مسودة",
+    "quiz.draft": "مسودة",
+    "quiz.minutes": "دقيقة",
+    "quiz.submissions": "إجابات",
+    "quiz.deleteConfirm": "هل أنت متأكد من حذف هذا الاختبار؟",
+    "quiz.deleted": "تم حذف الاختبار",
+    "quiz.available": "الاختبارات",
+    "quiz.availableDesc": "قم بحل اختبارات معلميك",
+    "quiz.noQuizzesAvailable": "لا توجد اختبارات متاحة",
+    "quiz.start": "ابدأ الاختبار",
+    "quiz.continue": "متابعة",
+    "quiz.viewResults": "عرض النتائج",
+    "quiz.submit": "تسليم الاختبار",
+    "quiz.submitted": "تم تسليم الاختبار وتصحيحه!",
+    "quiz.timeUp": "انتهى الوقت!",
+    "quiz.autoSubmit": "تم تسليم اختبارك تلقائياً",
+    "quiz.typeAnswer": "اكتب إجابتك",
+    "quiz.pts": "نقاط",
+    "quiz.results": "نتائج الاختبار",
+    "quiz.passed": "أحسنت! لقد نجحت!",
+    "quiz.needsImprovement": "واصل الدراسة، يمكنك تحقيق الأفضل!",
+    "quiz.aiFeedback": "ملاحظات الذكاء الاصطناعي",
+    "quiz.yourAnswer": "إجابتك",
+    "quiz.noAnswer": "بدون إجابة",
+    
+    // Grades
+    "grade.label": "الصف",
+    "grade.select": "اختر الصف",
+    "grade.filter": "تصفية حسب الصف",
+    "grade.all": "جميع الصفوف",
+  },
+};
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+  const [language, setLanguageState] = useState<Language>(() => {
+    const saved = localStorage.getItem("language");
+    return (saved as Language) || "en";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("language", language);
+    document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = language;
+  }, [language]);
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+  };
+
+  const t = (key: string): string => {
+    return translations[language][key as keyof typeof translations.en] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error("useLanguage must be used within a LanguageProvider");
+  }
+  return context;
+};

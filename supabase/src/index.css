@@ -1,0 +1,444 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modern Design System - Clean, Professional, Easy to Use */
+
+@layer base {
+  :root {
+    /* Light Mode - Vibrant & Colorful */
+    --background: 250 33% 97%;
+    --foreground: 249 47% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 249 47% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 249 47% 12%;
+
+    /* Primary - Vibrant Purple */
+    --primary: 263 70% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Warm Coral */
+    --secondary: 15 90% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 250 20% 94%;
+    --muted-foreground: 250 10% 40%;
+
+    /* Accent - Vibrant Pink */
+    --accent: 330 80% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Additional Vibrant Colors */
+    --purple: 263 70% 50%;
+    --pink: 330 80% 60%;
+    --orange: 25 95% 55%;
+    --green: 150 70% 45%;
+    --cyan: 180 80% 50%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 250 15% 88%;
+    --input: 250 15% 88%;
+    --ring: 263 70% 50%;
+
+    --radius: 1rem;
+
+    /* Sidebar */
+    --sidebar-background: 263 70% 8%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 263 70% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 330 80% 60%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 263 30% 20%;
+    --sidebar-ring: 263 70% 60%;
+
+    /* Custom Design Tokens */
+    --gradient-start: 263 70% 50%;
+    --gradient-end: 330 80% 60%;
+    --gradient-mid: 25 95% 55%;
+    --glow-color: 263 70% 50%;
+    --surface-elevated: 0 0% 100%;
+  }
+
+  .dark {
+    /* Dark Mode - Vibrant & Rich */
+    --background: 263 40% 7%;
+    --foreground: 0 0% 95%;
+
+    --card: 263 40% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 263 40% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    /* Primary - Vibrant Purple */
+    --primary: 263 80% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Warm Coral */
+    --secondary: 15 90% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 263 30% 15%;
+    --muted-foreground: 250 10% 70%;
+
+    /* Accent - Vibrant Pink */
+    --accent: 330 90% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Additional Vibrant Colors */
+    --purple: 263 80% 65%;
+    --pink: 330 90% 65%;
+    --orange: 25 95% 55%;
+    --green: 150 80% 50%;
+    --cyan: 180 90% 55%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 263 25% 18%;
+    --input: 263 25% 18%;
+    --ring: 263 80% 65%;
+
+    /* Sidebar */
+    --sidebar-background: 263 40% 7%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 263 80% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 330 90% 65%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 263 25% 15%;
+    --sidebar-ring: 263 80% 65%;
+
+    /* Custom Design Tokens */
+    --gradient-start: 263 80% 65%;
+    --gradient-end: 330 90% 65%;
+    --gradient-mid: 25 95% 55%;
+    --glow-color: 263 80% 65%;
+    --surface-elevated: 263 40% 12%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Tajawal', system-ui, sans-serif;
+    @apply bg-background text-foreground;
+    
+    /* Mobile Optimizations */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    overscroll-behavior: none;
+  }
+  
+  /* iOS Safe Area Support */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Smooth Scrolling for Mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Optimize Touch Targets for Mobile */
+  button, a, input, select, textarea {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+}
+
+@layer utilities {
+  /* Vibrant Gradient Text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 50%, hsl(var(--orange)) 100%);
+  }
+
+  /* Rainbow Gradient Text */
+  .gradient-text-rainbow {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      90deg, 
+      hsl(var(--primary)) 0%, 
+      hsl(var(--accent)) 25%, 
+      hsl(var(--orange)) 50%, 
+      hsl(var(--green)) 75%, 
+      hsl(var(--cyan)) 100%
+    );
+    background-size: 200% 100%;
+    animation: rainbow 3s linear infinite;
+  }
+
+  @keyframes rainbow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+
+  /* Glass Effect */
+  .glass {
+    @apply bg-card/70 backdrop-blur-xl border border-border/30;
+    background: linear-gradient(135deg, hsl(var(--card) / 0.8) 0%, hsl(var(--primary) / 0.05) 100%);
+  }
+
+  /* Colorful Glass */
+  .glass-colorful {
+    @apply backdrop-blur-xl border border-white/20;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary) / 0.1) 0%, 
+      hsl(var(--accent) / 0.1) 50%, 
+      hsl(var(--orange) / 0.1) 100%
+    );
+  }
+
+  /* Vibrant Glow */
+  .glow {
+    box-shadow: 0 0 40px -10px hsl(var(--glow-color) / 0.4), 
+                0 0 80px -20px hsl(var(--accent) / 0.2);
+  }
+
+  .glow-sm {
+    box-shadow: 0 0 20px -5px hsl(var(--glow-color) / 0.3);
+  }
+
+  .glow-multi {
+    box-shadow: 0 0 30px -5px hsl(var(--primary) / 0.4),
+                0 0 60px -10px hsl(var(--accent) / 0.3),
+                0 0 90px -15px hsl(var(--orange) / 0.2);
+  }
+
+  /* Modern Card Hover */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-hover:hover {
+    @apply -translate-y-2;
+    box-shadow: 0 25px 50px -25px hsl(var(--primary) / 0.3),
+                0 0 30px -10px hsl(var(--accent) / 0.2);
+  }
+
+  /* Colorful Card Hover */
+  .card-hover-colorful:hover {
+    @apply -translate-y-2;
+    background: linear-gradient(135deg, hsl(var(--card) / 0.9) 0%, hsl(var(--primary) / 0.1) 100%);
+    box-shadow: 0 25px 50px -25px hsl(var(--primary) / 0.4);
+    border-color: hsl(var(--primary) / 0.3);
+  }
+
+  /* Smooth Underline Animation */
+  .underline-animate {
+    @apply relative;
+  }
+
+  .underline-animate::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300;
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
+  }
+
+  .underline-animate:hover::after {
+    @apply w-full;
+  }
+
+  /* Button Press Effect */
+  .press-effect {
+    @apply transition-transform duration-150 active:scale-95;
+  }
+
+  /* Fade In Animation */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in-down {
+    animation: fadeInDown 0.6s ease-out forwards;
+  }
+
+  /* Stagger Children */
+  .stagger-children > * {
+    @apply animate-fade-in-up;
+    animation-fill-mode: both;
+  }
+
+  .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+  .stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+
+  /* Shimmer Effect */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--background)) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Gradient Border */
+  .gradient-border {
+    @apply relative;
+  }
+
+  .gradient-border::before {
+    content: '';
+    @apply absolute inset-0 rounded-[inherit] p-[1px];
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--orange)));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  /* Animated Background Shapes */
+  .bg-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: blob-float 10s ease-in-out infinite;
+  }
+
+  @keyframes blob-float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+  }
+
+  /* Colorful Dots Pattern */
+  .dots-pattern {
+    background-image: radial-gradient(circle at 2px 2px, hsl(var(--primary) / 0.15) 1.5px, transparent 0);
+    background-size: 32px 32px;
+  }
+
+  /* Colorful Dots with Colors */
+  .dots-colorful {
+    background-image: 
+      radial-gradient(circle at 8px 8px, hsl(263 70% 60% / 0.2) 2px, transparent 0),
+      radial-gradient(circle at 24px 8px, hsl(330 80% 60% / 0.2) 2px, transparent 0),
+      radial-gradient(circle at 16px 24px, hsl(25 95% 55% / 0.2) 2px, transparent 0),
+      radial-gradient(circle at 8px 40px, hsl(180 80% 50% / 0.2) 2px, transparent 0),
+      radial-gradient(circle at 24px 40px, hsl(150 70% 45% / 0.2) 2px, transparent 0);
+    background-size: 32px 48px;
+  }
+
+  /* Animated Dots */
+  .dots-animated {
+    background-image: 
+      radial-gradient(circle at 1px 1px, hsl(var(--primary) / 0.2) 1px, transparent 0),
+      radial-gradient(circle at 17px 17px, hsl(var(--accent) / 0.15) 1px, transparent 0),
+      radial-gradient(circle at 33px 33px, hsl(var(--orange) / 0.1) 1px, transparent 0);
+    background-size: 48px 48px;
+    animation: dots-move 20s linear infinite;
+  }
+
+  @keyframes dots-move {
+    0% { background-position: 0 0, 17px 17px, 33px 33px; }
+    100% { background-position: 48px 48px, 65px 65px, 81px 81px; }
+  }
+
+  /* Colorful Border */
+  .border-gradient {
+    border: 2px solid transparent;
+    background: linear-gradient(var(--background), var(--background)) padding-box,
+                linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent))) border-box;
+  }
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px -5px hsl(var(--primary) / 0.6);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}

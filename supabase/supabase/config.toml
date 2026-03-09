@@ -1,0 +1,7 @@
+ project_id = "izkeoahdigrutatipqiu"
+ 
+ [functions.check-ip-registration]
+ verify_jwt = false
+
+ [functions.grade-quiz]
+ verify_jwt = false
