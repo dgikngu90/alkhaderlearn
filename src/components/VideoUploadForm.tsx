@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Upload } from "lucide-react";
+import { Upload, X, AlertTriangle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { GRADES } from "@/constants/grades";
@@ -17,6 +17,9 @@ interface VideoUploadFormProps {
   user: User;
   onUploadComplete?: () => void;
 }
+
+const MAX_FILE_SIZE_MB = 500;
+const UPLOAD_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
   const { toast } = useToast();
@@ -29,8 +32,28 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
   const [grade, setGrade] = useState<string>("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [uploadSpeed, setUploadSpeed] = useState<string>("");
+  const xhrRef = useRef<XMLHttpRequest | null>(null);
+  const uploadStartTimeRef = useRef<number>(0);
 
   const categories = ["عربي", "English", "علوم حياتية", "كيمياء", "علوم ارض", "رياضيات", "مالية"];
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  };
+
+  const cancelUpload = () => {
+    if (xhrRef.current) {
+      xhrRef.current.abort();
+      xhrRef.current = null;
+    }
+    setUploading(false);
+    setUploadProgress(0);
+    setUploadSpeed("");
+    toast({ title: "Upload cancelled" });
+  };
 
   const uploadFileWithProgress = async (
     file: File,
@@ -39,29 +62,58 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      
+      xhrRef.current = xhr;
+      uploadStartTimeRef.current = Date.now();
+
+      // Timeout
+      const timeoutId = setTimeout(() => {
+        xhr.abort();
+        reject(new Error("Upload timed out. Please try again with a smaller file or better connection."));
+      }, UPLOAD_TIMEOUT_MS);
+
       xhr.upload.addEventListener("progress", (event) => {
         if (event.lengthComputable) {
           const progress = Math.round((event.loaded / event.total) * 100);
           onProgress(progress);
+
+          // Calculate speed
+          const elapsed = (Date.now() - uploadStartTimeRef.current) / 1000;
+          if (elapsed > 0.5) {
+            const speedBps = event.loaded / elapsed;
+            const remaining = (event.total - event.loaded) / speedBps;
+            const mins = Math.floor(remaining / 60);
+            const secs = Math.floor(remaining % 60);
+            setUploadSpeed(
+              `${formatFileSize(speedBps)}/s • ${mins > 0 ? `${mins}m ` : ""}${secs}s remaining`
+            );
+          }
         }
       });
 
-      xhr.addEventListener("load", async () => {
+      xhr.addEventListener("load", () => {
+        clearTimeout(timeoutId);
+        xhrRef.current = null;
         if (xhr.status >= 200 && xhr.status < 300) {
           resolve(path);
         } else {
-          reject(new Error(`Upload failed with status ${xhr.status}`));
+          reject(new Error(`Upload failed (${xhr.status}). Please try again.`));
         }
       });
 
       xhr.addEventListener("error", () => {
-        reject(new Error("Upload failed"));
+        clearTimeout(timeoutId);
+        xhrRef.current = null;
+        reject(new Error("Upload failed. Check your internet connection and try again."));
       });
 
-      // Get the upload URL
+      xhr.addEventListener("abort", () => {
+        clearTimeout(timeoutId);
+        xhrRef.current = null;
+      });
+
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (!session) {
+          clearTimeout(timeoutId);
           reject(new Error("Not authenticated"));
           return;
         }
@@ -78,67 +130,60 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!videoFile) {
+      toast({ variant: "destructive", title: "Error", description: "Please select a video file" });
+      return;
+    }
+
+    if (videoFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Please select a video file",
+        title: "File too large",
+        description: `Maximum file size is ${MAX_FILE_SIZE_MB} MB. Your file is ${formatFileSize(videoFile.size)}.`,
       });
       return;
     }
 
     setUploading(true);
     setUploadProgress(0);
+    setUploadSpeed("");
 
     try {
-      // Upload video with progress tracking
       const videoFileName = `${user.id}/${Date.now()}_${videoFile.name}`;
-      
+
       await uploadFileWithProgress(videoFile, videoFileName, (progress) => {
-        // Video upload is 90% of the total progress
         setUploadProgress(Math.round(progress * 0.9));
       });
 
       const videoUrl = `videos/${videoFileName}`;
 
-      // Upload thumbnail if provided
       let thumbnailUrl = null;
       if (thumbnailFile) {
         const thumbnailFileName = `${user.id}/${Date.now()}_thumb_${thumbnailFile.name}`;
         const { error: thumbError } = await supabase.storage
           .from("videos")
           .upload(thumbnailFileName, thumbnailFile);
-
         if (thumbError) throw thumbError;
-
         thumbnailUrl = `videos/${thumbnailFileName}`;
         setUploadProgress(95);
       }
 
-      // Create video record
-      const { error: dbError } = await supabase
-        .from("videos")
-        .insert([{
-          title,
-          description,
-          category: category as any,
-          grade: grade as any || null,
-          video_url: videoUrl,
-          thumbnail_url: thumbnailUrl,
-          teacher_id: user.id,
-          quality_standard: videoUrl,
-          quality_hd: videoUrl,
-        }]);
+      const { error: dbError } = await supabase.from("videos").insert([{
+        title,
+        description,
+        category: category as any,
+        grade: grade as any || null,
+        video_url: videoUrl,
+        thumbnail_url: thumbnailUrl,
+        teacher_id: user.id,
+        quality_standard: videoUrl,
+        quality_hd: videoUrl,
+      }]);
 
       if (dbError) throw dbError;
 
       setUploadProgress(100);
+      toast({ title: "Success!", description: "Video uploaded successfully" });
 
-      toast({
-        title: "Success!",
-        description: "Video uploaded successfully",
-      });
-
-      // Reset form
       setTitle("");
       setDescription("");
       setCategory("عربي");
@@ -146,18 +191,16 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
       setVideoFile(null);
       setThumbnailFile(null);
       setUploadProgress(0);
-      
+      setUploadSpeed("");
       onUploadComplete?.();
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Upload failed",
-        description: error.message,
-      });
+      toast({ variant: "destructive", title: "Upload failed", description: error.message });
     } finally {
       setUploading(false);
     }
   };
+
+  const fileSizeWarning = videoFile && videoFile.size > 100 * 1024 * 1024;
 
   return (
     <Card>
@@ -172,39 +215,21 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
         <form onSubmit={handleUpload} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">Video Title</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Introduction to Mathematics"
-              required
-              disabled={uploading}
-            />
+            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Introduction to Mathematics" required disabled={uploading} />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of the video content..."
-              rows={3}
-              disabled={uploading}
-            />
+            <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description of the video content..." rows={3} disabled={uploading} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Select value={category} onValueChange={setCategory} disabled={uploading}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -228,30 +253,23 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
 
           <div className="space-y-2">
             <Label htmlFor="video">Video File</Label>
-            <Input
-              id="video"
-              type="file"
-              accept="video/*"
-              onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
-              required
-              disabled={uploading}
-            />
+            <Input id="video" type="file" accept="video/*" onChange={(e) => setVideoFile(e.target.files?.[0] || null)} required disabled={uploading} />
             {videoFile && (
               <p className="text-sm text-muted-foreground">
-                Selected: {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
+                Selected: {videoFile.name} ({formatFileSize(videoFile.size)})
               </p>
+            )}
+            {fileSizeWarning && (
+              <div className="flex items-center gap-2 text-sm text-amber-600">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                <span>Large file — upload may take several minutes on slow connections.</span>
+              </div>
             )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="thumbnail">Thumbnail (Optional)</Label>
-            <Input
-              id="thumbnail"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
-              disabled={uploading}
-            />
+            <Input id="thumbnail" type="file" accept="image/*" onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)} disabled={uploading} />
           </div>
 
           {uploading && (
@@ -261,12 +279,22 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
                 <span>{uploadProgress}%</span>
               </div>
               <Progress value={uploadProgress} className="w-full" />
+              {uploadSpeed && (
+                <p className="text-xs text-muted-foreground">{uploadSpeed}</p>
+              )}
             </div>
           )}
 
-          <Button type="submit" disabled={uploading} className="w-full">
-            {uploading ? `Uploading... ${uploadProgress}%` : "Upload Video"}
-          </Button>
+          <div className="flex gap-2">
+            <Button type="submit" disabled={uploading} className="flex-1">
+              {uploading ? `Uploading... ${uploadProgress}%` : "Upload Video"}
+            </Button>
+            {uploading && (
+              <Button type="button" variant="destructive" onClick={cancelUpload} size="icon">
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </form>
       </CardContent>
     </Card>
