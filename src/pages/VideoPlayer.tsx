@@ -18,7 +18,7 @@ const VideoPlayer = () => {
   const [watchTime, setWatchTime] = useState<number>(0);
   const [earnedPoints, setEarnedPoints] = useState<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const watchTimeRef = useRef<number>(0);
 
   useEffect(() => {
