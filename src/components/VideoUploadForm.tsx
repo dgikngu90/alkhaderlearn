@@ -18,7 +18,6 @@ interface VideoUploadFormProps {
   onUploadComplete?: () => void;
 }
 
-const MAX_FILE_SIZE_MB = 500;
 const UPLOAD_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
