@@ -108,18 +108,39 @@ const Dashboard = () => {
 
         if (!isMounted) return;
 
-        const isAdmin = !!adminRes.data;
-        const isTeacher = !!teacherRes.data;
-        const isStudent = !!studentRes.data;
+        const hasRpcError = adminRes.error || teacherRes.error || studentRes.error;
 
-        if (isAdmin) setRole("admin");
-        else if (isTeacher) setRole("teacher");
-        else if (isStudent) setRole("student");
-        else setRole("student");
-      } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error("Error resolving role:", error);
+        if (!hasRpcError) {
+          const isAdmin = adminRes.data === true;
+          const isTeacher = teacherRes.data === true;
+          const isStudent = studentRes.data === true;
+
+          if (isAdmin) { setRole("admin"); return; }
+          if (isTeacher) { setRole("teacher"); return; }
+          if (isStudent) { setRole("student"); return; }
         }
+
+        console.warn("RPC role check failed or returned no match, trying direct query", {
+          adminErr: adminRes.error, teacherErr: teacherRes.error, studentErr: studentRes.error
+        });
+
+        const { data: roles, error: rolesError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id);
+
+        if (!isMounted) return;
+
+        if (!rolesError && roles && roles.length > 0) {
+          const roleValues = roles.map(r => r.role);
+          if (roleValues.includes("admin")) { setRole("admin"); return; }
+          if (roleValues.includes("teacher")) { setRole("teacher"); return; }
+          if (roleValues.includes("student")) { setRole("student"); return; }
+        }
+
+        setRole("student");
+      } catch (error) {
+        console.error("Error resolving role:", error);
         if (isMounted) setRole("student");
       } finally {
         window.clearTimeout(roleFallback);
