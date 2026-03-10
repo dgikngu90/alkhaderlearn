@@ -133,15 +133,6 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
       return;
     }
 
-    if (videoFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      toast({
-        variant: "destructive",
-        title: "File too large",
-        description: `Maximum file size is ${MAX_FILE_SIZE_MB} MB. Your file is ${formatFileSize(videoFile.size)}.`,
-      });
-      return;
-    }
-
     setUploading(true);
     setUploadProgress(0);
     setUploadSpeed("");
