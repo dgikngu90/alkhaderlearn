@@ -18,8 +18,6 @@ interface VideoUploadFormProps {
   onUploadComplete?: () => void;
 }
 
-const UPLOAD_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
-
 const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
   const { toast } = useToast();
   const { t, language } = useLanguage();
@@ -64,12 +62,6 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
       xhrRef.current = xhr;
       uploadStartTimeRef.current = Date.now();
 
-      // Timeout
-      const timeoutId = setTimeout(() => {
-        xhr.abort();
-        reject(new Error("Upload timed out. Please try again with a smaller file or better connection."));
-      }, UPLOAD_TIMEOUT_MS);
-
       xhr.upload.addEventListener("progress", (event) => {
         if (event.lengthComputable) {
           const progress = Math.round((event.loaded / event.total) * 100);
@@ -90,7 +82,6 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
       });
 
       xhr.addEventListener("load", () => {
-        clearTimeout(timeoutId);
         xhrRef.current = null;
         if (xhr.status >= 200 && xhr.status < 300) {
           resolve(path);
@@ -100,19 +91,16 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
       });
 
       xhr.addEventListener("error", () => {
-        clearTimeout(timeoutId);
         xhrRef.current = null;
         reject(new Error("Upload failed. Check your internet connection and try again."));
       });
 
       xhr.addEventListener("abort", () => {
-        clearTimeout(timeoutId);
         xhrRef.current = null;
       });
 
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (!session) {
-          clearTimeout(timeoutId);
           reject(new Error("Not authenticated"));
           return;
         }
