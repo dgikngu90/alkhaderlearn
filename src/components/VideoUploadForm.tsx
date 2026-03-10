@@ -18,7 +18,6 @@ interface VideoUploadFormProps {
   onUploadComplete?: () => void;
 }
 
-const MAX_FILE_SIZE_MB = 500;
 const UPLOAD_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
@@ -131,15 +130,6 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
     e.preventDefault();
     if (!videoFile) {
       toast({ variant: "destructive", title: "Error", description: "Please select a video file" });
-      return;
-    }
-
-    if (videoFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      toast({
-        variant: "destructive",
-        title: "File too large",
-        description: `Maximum file size is ${MAX_FILE_SIZE_MB} MB. Your file is ${formatFileSize(videoFile.size)}.`,
-      });
       return;
     }
 
