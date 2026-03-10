@@ -109,6 +109,7 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
         xhr.open("POST", url);
         xhr.setRequestHeader("Authorization", `Bearer ${session.access_token}`);
         xhr.setRequestHeader("x-upsert", "true");
+        xhr.setRequestHeader("Content-Type", file.type || "video/mp4");
         xhr.send(file);
       });
     });
