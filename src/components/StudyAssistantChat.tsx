@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Send, Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { MessageCircle, Send, Sparkles, Bot, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -110,29 +111,48 @@ const StudyAssistantChat = () => {
   };
 
   return (
-    <Card className="glass border-border/50">
-      <CardHeader>
+    <Card className="glass-vibrant border-border/50 overflow-hidden group">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-accent" />
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+      
+      <CardHeader className="relative z-10">
         <CardTitle className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-            <Sparkles className="h-5 w-5 text-accent" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <Bot className="h-6 w-6 text-white" />
           </div>
-          {title}
+          <span className="gradient-text">{title}</span>
+          <Sparkles className="w-5 h-5 text-amber-400 animate-pulse ml-auto" />
         </CardTitle>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription className="text-base flex items-center gap-2">
+          <Zap className="w-4 h-4 text-amber-500" />
+          {subtitle}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="h-72 rounded-xl p-4 bg-secondary/30 overflow-y-auto">
+      
+      <CardContent className="space-y-4 relative z-10">
+        <div className="h-80 rounded-2xl p-4 bg-gradient-to-br from-secondary/30 to-primary/5 overflow-y-auto border border-primary/10">
           {messages.length === 0 ? (
             <div className="h-full flex items-center justify-center">
-              <div className="text-center space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mx-auto">
-                  <MessageCircle className="h-6 w-6 text-muted-foreground" />
+              <div className="text-center space-y-4">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center mx-auto animate-float">
+                  <Bot className="h-10 w-10 text-violet-500" />
                 </div>
                 <p className="text-sm text-muted-foreground max-w-xs">{emptyState}</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary cursor-pointer hover:bg-primary/20" onClick={() => setInput(isArabic ? "كيف أذاكر الرياضيات؟" : "How do I study math?")}>
+                    📐 {isArabic ? "رياضيات" : "Math"}
+                  </Badge>
+                  <Badge variant="outline" className="bg-accent/10 border-accent/20 text-accent cursor-pointer hover:bg-accent/20" onClick={() => setInput(isArabic ? "كيف أذاكر الكيمياء؟" : "How do I study chemistry?")}>
+                    🧪 {isArabic ? "كيمياء" : "Chemistry"}
+                  </Badge>
+                  <Badge variant="outline" className="bg-cyan-500/10 border-cyan-500/20 text-cyan-600 cursor-pointer hover:bg-cyan-500/20" onClick={() => setInput(isArabic ? "كيف أذاكر اللغة الإنجليزية؟" : "How do I study English?")}>
+                    📚 English
+                  </Badge>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -141,21 +161,35 @@ const StudyAssistantChat = () => {
                   <div
                     className={
                       message.role === "user"
-                        ? "max-w-[80%] rounded-2xl rounded-br-md px-4 py-2.5 text-sm bg-primary text-primary-foreground shadow-sm"
-                        : "max-w-[80%] rounded-2xl rounded-bl-md px-4 py-2.5 text-sm bg-card text-foreground border border-border/50 shadow-sm"
+                        ? "max-w-[85%] rounded-2xl rounded-br-md px-4 py-3 text-sm bg-gradient-to-r from-primary to-violet-500 text-white shadow-lg"
+                        : "max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 text-sm bg-gradient-to-br from-card to-violet-500/10 text-foreground border border-violet-500/20 shadow-sm"
                     }
                   >
-                    {message.content}
+                    {message.role === "assistant" && (
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+                          <Bot className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-xs font-medium text-violet-500">AI</span>
+                      </div>
+                    )}
+                    <p className="leading-relaxed">{message.content}</p>
                   </div>
                 </div>
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="max-w-[80%] rounded-2xl rounded-bl-md px-4 py-2.5 text-sm bg-card text-muted-foreground border border-border/50 shadow-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 text-sm bg-gradient-to-br from-card to-violet-500/10 border border-violet-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+                        <Bot className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-xs font-medium text-violet-500">AI</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 h-2 rounded-full bg-fuchsia-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 h-2 rounded-full bg-accent animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 </div>
@@ -171,14 +205,14 @@ const StudyAssistantChat = () => {
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="min-h-[52px] max-h-32 resize-none bg-background/50 rounded-xl"
+            className="min-h-[52px] max-h-32 resize-none bg-background/50 rounded-xl border-primary/20 focus:border-primary/50 focus:ring-primary/20"
             rows={1}
           />
           <Button
             onClick={handleSend}
             disabled={isLoading || !input.trim()}
             size="icon"
-            className="h-[52px] w-[52px] rounded-xl flex-shrink-0 press-effect"
+            className="h-[52px] w-[52px] rounded-xl flex-shrink-0 press-effect bg-gradient-to-r from-primary to-violet-500 hover:from-primary/90 hover:to-violet-500/90 border-0 disabled:opacity-50"
           >
             <Send className="h-5 w-5" />
           </Button>

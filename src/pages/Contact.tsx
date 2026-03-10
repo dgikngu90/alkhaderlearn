@@ -17,8 +17,8 @@ const Contact = () => {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-3">{t("landing.contact.desc")}</p>
-          <a href="tel:0788212294" className="text-xl font-bold gradient-text underline-animate">
-            0788212294
+          <a href="tel:0797732606" className="text-xl font-bold gradient-text underline-animate">
+            0797732606
           </a>
         </CardContent>
       </Card>

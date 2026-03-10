@@ -16,6 +16,7 @@ import VideoPlayer from "./pages/VideoPlayer";
 import TakeQuiz from "./pages/TakeQuiz";
 import QuizResult from "./pages/QuizResult";
 import NotFound from "./pages/NotFound";
+import Quizzes from "./pages/Quizzes";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/quizzes" element={<Quizzes />} />
           <Route path="/video/:videoId" element={<VideoPlayer />} />
           <Route path="/quiz/:quizId" element={<TakeQuiz />} />
           <Route path="/quiz-result/:attemptId" element={<QuizResult />} />
