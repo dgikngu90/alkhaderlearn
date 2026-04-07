@@ -1,12 +1,23 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+const allowedOrigins = [
+  'https://alkhaderlearn.lovable.app',
+  'http://localhost:8080',
+  'http://localhost:5173',
+];
 
-serve(async (req) => {
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') || '';
+  const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.lovable.app');
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+  };
+}
+
+Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
@@ -17,7 +28,6 @@ serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Fetch attempt with quiz and questions
     const { data: attempt, error: attemptErr } = await supabase
       .from("quiz_attempts")
       .select("*")
@@ -63,7 +73,6 @@ serve(async (req) => {
       });
     }
 
-    // Award points: 10 per correct answer
     if (correctAnswers > 0) {
       const pointsToAdd = correctAnswers * 10;
       await supabase.rpc("add_points", {
@@ -74,7 +83,6 @@ serve(async (req) => {
       });
     }
 
-    // Use AI for feedback on text answers
     let aiFeedback = "";
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
@@ -112,7 +120,6 @@ Provide brief, encouraging feedback in 2-3 sentences. If the student made mistak
       }
     }
 
-    // Update attempt with results
     const { error: updateErr } = await supabase
       .from("quiz_attempts")
       .update({
@@ -130,6 +137,7 @@ Provide brief, encouraging feedback in 2-3 sentences. If the student made mistak
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
+    const corsHeaders = getCorsHeaders(req);
     console.error("grade-quiz error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
       status: 500,
