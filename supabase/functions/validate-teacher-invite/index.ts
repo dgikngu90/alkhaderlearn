@@ -1,12 +1,23 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.76.1'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+const allowedOrigins = [
+  'https://alkhaderlearn.lovable.app',
+  'http://localhost:8080',
+  'http://localhost:5173',
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') || '';
+  const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.lovable.app');
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -21,19 +32,16 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Create Supabase client with service role for validation
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Hash the provided code
     const encoder = new TextEncoder()
     const data = encoder.encode(inviteCode)
     const hashBuffer = await crypto.subtle.digest('SHA-256', data)
     const hashArray = Array.from(new Uint8Array(hashBuffer))
     const codeHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
 
-    // Check if the hashed code exists and is active
     const { data: inviteData, error } = await supabase
       .from('teacher_invite_codes')
       .select('is_active')
