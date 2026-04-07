@@ -94,7 +94,7 @@ const SubscriptionCard = ({ userId, hasActiveSubscription, onSubscriptionChange 
     const container = document.getElementById('paypal-container-RNRYCK75FERFW');
     if (container && window.paypal?.HostedButtons && !hasActiveSubscription) {
       try {
-        container.innerHTML = '';
+        while (container.firstChild) container.removeChild(container.firstChild);
         window.paypal.HostedButtons({
           hostedButtonId: "RNRYCK75FERFW",
         }).render("#paypal-container-RNRYCK75FERFW");
