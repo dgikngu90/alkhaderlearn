@@ -155,6 +155,121 @@ export type Database = {
         }
         Relationships: []
       }
+      pacman_attempts: {
+        Row: {
+          completed_at: string
+          correct_count: number
+          game_id: string
+          id: string
+          points_earned: number
+          student_id: string
+        }
+        Insert: {
+          completed_at?: string
+          correct_count?: number
+          game_id: string
+          id?: string
+          points_earned?: number
+          student_id: string
+        }
+        Update: {
+          completed_at?: string
+          correct_count?: number
+          game_id?: string
+          id?: string
+          points_earned?: number
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pacman_attempts_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "pacman_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pacman_games: {
+        Row: {
+          created_at: string
+          description: string | null
+          grade: Database["public"]["Enums"]["grade_level"] | null
+          id: string
+          is_published: boolean
+          teacher_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          grade?: Database["public"]["Enums"]["grade_level"] | null
+          id?: string
+          is_published?: boolean
+          teacher_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          grade?: Database["public"]["Enums"]["grade_level"] | null
+          id?: string
+          is_published?: boolean
+          teacher_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pacman_questions: {
+        Row: {
+          answer_a: string
+          answer_b: string
+          answer_c: string
+          answer_d: string
+          correct_answer: string
+          created_at: string
+          game_id: string
+          id: string
+          order_index: number
+          question_text: string
+        }
+        Insert: {
+          answer_a: string
+          answer_b: string
+          answer_c: string
+          answer_d: string
+          correct_answer: string
+          created_at?: string
+          game_id: string
+          id?: string
+          order_index?: number
+          question_text: string
+        }
+        Update: {
+          answer_a?: string
+          answer_b?: string
+          answer_c?: string
+          answer_d?: string
+          correct_answer?: string
+          created_at?: string
+          game_id?: string
+          id?: string
+          order_index?: number
+          question_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pacman_questions_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "pacman_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
