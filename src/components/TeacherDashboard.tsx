@@ -3,12 +3,15 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Video, Mail, ClipboardList, Users, Eye, Trophy, Inbox } from "lucide-react";
+import { Video, Mail, ClipboardList, Users, Trophy, Inbox, Ghost } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VideoList from "./VideoList";
 import VideoUploadForm from "./VideoUploadForm";
 import SendMessageDialog from "./SendMessageDialog";
 import CreateQuizForm from "./CreateQuizForm";
 import TeacherQuizList from "./TeacherQuizList";
+import CreatePacmanGameForm from "./CreatePacmanGameForm";
+import TeacherPacmanList from "./TeacherPacmanList";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 
