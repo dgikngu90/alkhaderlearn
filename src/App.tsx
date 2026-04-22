@@ -17,6 +17,8 @@ import TakeQuiz from "./pages/TakeQuiz";
 import QuizResult from "./pages/QuizResult";
 import NotFound from "./pages/NotFound";
 import Quizzes from "./pages/Quizzes";
+import Games from "./pages/Games";
+import PacmanGame from "./pages/PacmanGame";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,8 @@ const App = () => (
           <Route path="/video/:videoId" element={<VideoPlayer />} />
           <Route path="/quiz/:quizId" element={<TakeQuiz />} />
           <Route path="/quiz-result/:attemptId" element={<QuizResult />} />
+          <Route path="/games" element={<Games />} />
+          <Route path="/pacman/:gameId" element={<PacmanGame />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

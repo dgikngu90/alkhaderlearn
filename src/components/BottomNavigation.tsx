@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, MessageSquare, Video, Bot, ClipboardList } from "lucide-react";
+import { Home, MessageSquare, Video, Bot, ClipboardList, Ghost } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const BottomNavigation = () => {
@@ -11,6 +11,7 @@ const BottomNavigation = () => {
     { path: "/dashboard", icon: Home, label: t("student.nav.hero"), gradient: "from-primary to-violet-500" },
     { path: "/messages", icon: MessageSquare, label: t("messages"), gradient: "from-accent to-fuchsia-500" },
     { path: "/quizzes", icon: ClipboardList, label: t("quiz.available"), gradient: "from-cyan-500 to-emerald-500" },
+    { path: "/games", icon: Ghost, label: "Games", gradient: "from-yellow-400 to-amber-500" },
     { path: "/videos", icon: Video, label: t("student.nav.videos"), gradient: "from-amber-500 to-orange-500" },
     { path: "/assistant", icon: Bot, label: t("student.nav.assistant"), gradient: "from-violet-500 to-primary" },
   ];
