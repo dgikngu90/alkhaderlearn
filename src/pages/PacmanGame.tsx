@@ -49,12 +49,12 @@ const LETTER_POSITIONS: Record<"a" | "b" | "c" | "d", { x: number; y: number }> 
 // Player spawn (center)
 const SPAWN = { x: 9, y: 10 };
 
-// Ghost spawns
+// Ghost spawns - placed far from player spawn so they can't trap the player instantly
 const GHOST_SPAWNS = [
-  { x: 9, y: 8 },
-  { x: 9, y: 12 },
-  { x: 7, y: 10 },
-  { x: 11, y: 10 },
+  { x: 1, y: 10 },
+  { x: COLS - 2, y: 10 },
+  { x: 9, y: 1 },
+  { x: 9, y: ROWS - 2 },
 ];
 
 interface Question {
