@@ -499,31 +499,55 @@ const PacmanGame = () => {
               </CardContent>
             </Card>
 
-            {/* Maze */}
+            {/* Maze - constrained so controls stay visible */}
             <div className="flex justify-center">
               <canvas
                 ref={canvasRef}
                 width={COLS * CELL}
                 height={ROWS * CELL}
-                className="rounded-lg border border-primary/30 max-w-full h-auto"
+                className="rounded-lg border border-primary/30 w-full max-w-[360px] h-auto"
                 style={{ touchAction: "none" }}
               />
             </div>
 
-            {/* Mobile controls */}
-            <div className="grid grid-cols-3 gap-2 max-w-[220px] mx-auto select-none">
+            {/* On-screen D-pad controls (always visible above bottom nav) */}
+            <div className="sticky bottom-20 z-10 grid grid-cols-3 gap-2 max-w-[240px] mx-auto select-none">
               <div />
-              <Button variant="outline" size="lg" onClick={() => handleDirButton(DIRS.up)}>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-14 text-2xl shadow-lg"
+                onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.up); }}
+                onClick={() => handleDirButton(DIRS.up)}
+              >
                 ▲
               </Button>
               <div />
-              <Button variant="outline" size="lg" onClick={() => handleDirButton(DIRS.left)}>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-14 text-2xl shadow-lg"
+                onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.left); }}
+                onClick={() => handleDirButton(DIRS.left)}
+              >
                 ◀
               </Button>
-              <Button variant="outline" size="lg" onClick={() => handleDirButton(DIRS.down)}>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-14 text-2xl shadow-lg"
+                onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.down); }}
+                onClick={() => handleDirButton(DIRS.down)}
+              >
                 ▼
               </Button>
-              <Button variant="outline" size="lg" onClick={() => handleDirButton(DIRS.right)}>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-14 text-2xl shadow-lg"
+                onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.right); }}
+                onClick={() => handleDirButton(DIRS.right)}
+              >
                 ▶
               </Button>
             </div>
