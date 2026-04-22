@@ -49,12 +49,12 @@ const LETTER_POSITIONS: Record<"a" | "b" | "c" | "d", { x: number; y: number }> 
 // Player spawn (center)
 const SPAWN = { x: 9, y: 10 };
 
-// Ghost spawns
+// Ghost spawns - placed far from player spawn so they can't trap the player instantly
 const GHOST_SPAWNS = [
-  { x: 9, y: 8 },
-  { x: 9, y: 12 },
-  { x: 7, y: 10 },
-  { x: 11, y: 10 },
+  { x: 1, y: 10 },
+  { x: COLS - 2, y: 10 },
+  { x: 9, y: 1 },
+  { x: 9, y: ROWS - 2 },
 ];
 
 interface Question {
@@ -104,6 +104,7 @@ const PacmanGame = () => {
   const lastTickRef = useRef(0);
   const animationRef = useRef<number>(0);
   const phaseRef = useRef(phase);
+  const graceRef = useRef(0); // ticks of invulnerability after spawn/respawn
   phaseRef.current = phase;
 
   // Auth & data fetch
@@ -141,6 +142,7 @@ const PacmanGame = () => {
     dirRef.current = { dx: 0, dy: 0 };
     queuedDirRef.current = null;
     ghostsRef.current = GHOST_SPAWNS.map((g) => ({ ...g, dir: DIRS.up }));
+    graceRef.current = 12; // ~2 seconds of grace time after spawn
   }, []);
 
   const currentQuestion = questions[qIndex];
@@ -268,46 +270,45 @@ const PacmanGame = () => {
           }
         }
 
-        // Ghost movement
-        ghostsRef.current = ghostsRef.current.map((g) => {
-          const candidates: Dir[] = [];
-          for (const d of Object.values(DIRS)) {
-            if (d.dx === -g.dir.dx && d.dy === -g.dir.dy) continue;
-            if (!isWall(g.x + d.dx, g.y + d.dy)) candidates.push(d);
-          }
-          let chosen = g.dir;
-          // Prefer chasing player 60% of the time
-          if (candidates.length > 0) {
-            if (Math.random() < 0.65) {
-              const pr = playerRef.current;
-              candidates.sort((a, b) => {
-                const da = Math.abs(g.x + a.dx - pr.x) + Math.abs(g.y + a.dy - pr.y);
-                const db = Math.abs(g.x + b.dx - pr.x) + Math.abs(g.y + b.dy - pr.y);
-                return da - db;
-              });
-              chosen = candidates[0];
-            } else {
-              chosen = candidates[Math.floor(Math.random() * candidates.length)];
+        // Ghost movement (frozen during grace period)
+        if (graceRef.current > 0) {
+          graceRef.current -= 1;
+        } else {
+          ghostsRef.current = ghostsRef.current.map((g) => {
+            const candidates: Dir[] = [];
+            for (const d of Object.values(DIRS)) {
+              if (d.dx === -g.dir.dx && d.dy === -g.dir.dy) continue;
+              if (!isWall(g.x + d.dx, g.y + d.dy)) candidates.push(d);
             }
-          } else if (!isWall(g.x - g.dir.dx, g.y - g.dir.dy)) {
-            chosen = { dx: -g.dir.dx, dy: -g.dir.dy };
-          }
-          let nx = g.x + chosen.dx;
-          if (nx < 0) nx = COLS - 1;
-          if (nx >= COLS) nx = 0;
-          return { x: nx, y: g.y + chosen.dy, dir: chosen };
-        });
+            let chosen = g.dir;
+            if (candidates.length > 0) {
+              if (Math.random() < 0.5) {
+                const pr = playerRef.current;
+                candidates.sort((a, b) => {
+                  const da = Math.abs(g.x + a.dx - pr.x) + Math.abs(g.y + a.dy - pr.y);
+                  const db = Math.abs(g.x + b.dx - pr.x) + Math.abs(g.y + b.dy - pr.y);
+                  return da - db;
+                });
+                chosen = candidates[0];
+              } else {
+                chosen = candidates[Math.floor(Math.random() * candidates.length)];
+              }
+            } else if (!isWall(g.x - g.dir.dx, g.y - g.dir.dy)) {
+              chosen = { dx: -g.dir.dx, dy: -g.dir.dy };
+            }
+            let nx = g.x + chosen.dx;
+            if (nx < 0) nx = COLS - 1;
+            if (nx >= COLS) nx = 0;
+            return { x: nx, y: g.y + chosen.dy, dir: chosen };
+          });
 
-        // Check ghost collision -> respawn player
-        const pp = playerRef.current;
-        for (const g of ghostsRef.current) {
-          if (g.x === pp.x && g.y === pp.y) {
-            // respawn
-            playerRef.current = { x: SPAWN.x, y: SPAWN.y };
-            dirRef.current = { dx: 0, dy: 0 };
-            queuedDirRef.current = null;
-            ghostsRef.current = GHOST_SPAWNS.map((s) => ({ ...s, dir: DIRS.up }));
-            break;
+          // Check ghost collision -> respawn player (only when not in grace)
+          const pp = playerRef.current;
+          for (const g of ghostsRef.current) {
+            if (g.x === pp.x && g.y === pp.y) {
+              resetPositions();
+              break;
+            }
           }
         }
       }
@@ -390,7 +391,14 @@ const PacmanGame = () => {
     lastTickRef.current = 0;
     animationRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animationRef.current);
-  }, [phase, currentQuestion, advance]);
+  }, [phase, currentQuestion, advance, resetPositions]);
+
+  // Initialize grace period whenever entering playing
+  useEffect(() => {
+    if (phase === "playing") {
+      graceRef.current = 12;
+    }
+  }, [phase, qIndex]);
 
   if (loading) {
     return (
@@ -491,31 +499,55 @@ const PacmanGame = () => {
               </CardContent>
             </Card>
 
-            {/* Maze */}
+            {/* Maze - constrained so controls stay visible */}
             <div className="flex justify-center">
               <canvas
                 ref={canvasRef}
                 width={COLS * CELL}
                 height={ROWS * CELL}
-                className="rounded-lg border border-primary/30 max-w-full h-auto"
+                className="rounded-lg border border-primary/30 w-full max-w-[360px] h-auto"
                 style={{ touchAction: "none" }}
               />
             </div>
 
-            {/* Mobile controls */}
-            <div className="grid grid-cols-3 gap-2 max-w-[220px] mx-auto select-none">
+            {/* On-screen D-pad controls (always visible above bottom nav) */}
+            <div className="sticky bottom-20 z-10 grid grid-cols-3 gap-2 max-w-[240px] mx-auto select-none">
               <div />
-              <Button variant="outline" size="lg" onClick={() => handleDirButton(DIRS.up)}>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-14 text-2xl shadow-lg"
+                onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.up); }}
+                onClick={() => handleDirButton(DIRS.up)}
+              >
                 ▲
               </Button>
               <div />
-              <Button variant="outline" size="lg" onClick={() => handleDirButton(DIRS.left)}>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-14 text-2xl shadow-lg"
+                onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.left); }}
+                onClick={() => handleDirButton(DIRS.left)}
+              >
                 ◀
               </Button>
-              <Button variant="outline" size="lg" onClick={() => handleDirButton(DIRS.down)}>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-14 text-2xl shadow-lg"
+                onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.down); }}
+                onClick={() => handleDirButton(DIRS.down)}
+              >
                 ▼
               </Button>
-              <Button variant="outline" size="lg" onClick={() => handleDirButton(DIRS.right)}>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-14 text-2xl shadow-lg"
+                onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.right); }}
+                onClick={() => handleDirButton(DIRS.right)}
+              >
                 ▶
               </Button>
             </div>
