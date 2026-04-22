@@ -391,7 +391,14 @@ const PacmanGame = () => {
     lastTickRef.current = 0;
     animationRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animationRef.current);
-  }, [phase, currentQuestion, advance]);
+  }, [phase, currentQuestion, advance, resetPositions]);
+
+  // Initialize grace period whenever entering playing
+  useEffect(() => {
+    if (phase === "playing") {
+      graceRef.current = 12;
+    }
+  }, [phase, qIndex]);
 
   if (loading) {
     return (
