@@ -3,12 +3,15 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Video, Mail, ClipboardList, Users, Eye, Trophy, Inbox } from "lucide-react";
+import { Video, Mail, ClipboardList, Users, Trophy, Inbox, Ghost } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VideoList from "./VideoList";
 import VideoUploadForm from "./VideoUploadForm";
 import SendMessageDialog from "./SendMessageDialog";
 import CreateQuizForm from "./CreateQuizForm";
 import TeacherQuizList from "./TeacherQuizList";
+import CreatePacmanGameForm from "./CreatePacmanGameForm";
+import TeacherPacmanList from "./TeacherPacmanList";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 
@@ -120,60 +123,94 @@ const TeacherDashboard = ({ user }: TeacherDashboardProps) => {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Messaging Section */}
-        <Card className="glass overflow-hidden border-border/50">
-          <CardHeader className="bg-muted/30">
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5 text-primary" />
-              {t("messages")}
-            </CardTitle>
-            <CardDescription>{t("sendMessage")}</CardDescription>
-          </CardHeader>
-          <CardContent className="py-6 flex flex-wrap gap-4">
-            <SendMessageDialog user={user} />
-            <Button variant="outline" onClick={() => navigate("/messages")} className="flex-1 sm:flex-none">
-              <Inbox className="h-4 w-4 mr-2" />
-              {t("messages")}
-            </Button>
-          </CardContent>
-        </Card>
-
-        <VideoUploadForm user={user} onUploadComplete={handleUploadComplete} />
-      </div>
-
-      {/* Quizzes Section */}
-      <Card className="glass border-border/50 overflow-hidden">
-        <CardHeader className="bg-muted/30 border-b">
+      {/* Messaging Section */}
+      <Card className="glass overflow-hidden border-border/50">
+        <CardHeader className="bg-muted/30">
           <CardTitle className="flex items-center gap-2">
-            <ClipboardList className="h-5 w-5" />
-            {t("quiz.section")}
+            <Mail className="h-5 w-5 text-primary" />
+            {t("messages")}
           </CardTitle>
-          <CardDescription>{t("quiz.sectionDesc")}</CardDescription>
+          <CardDescription>{t("sendMessage")}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-8 p-6">
-          <CreateQuizForm user={user} onQuizCreated={() => setQuizRefreshKey(prev => prev + 1)} />
-          <div className="pt-4 border-t">
-            <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-              <ClipboardList className="h-5 w-5 text-accent" />
-              {t("quiz.myQuizzes")}
-            </h3>
-            <TeacherQuizList user={user} refreshKey={quizRefreshKey} />
-          </div>
+        <CardContent className="py-6 flex flex-wrap gap-4">
+          <SendMessageDialog user={user} />
+          <Button variant="outline" onClick={() => navigate("/messages")} className="flex-1 sm:flex-none">
+            <Inbox className="h-4 w-4 mr-2" />
+            {t("messages")}
+          </Button>
         </CardContent>
       </Card>
 
-      <Card className="glass border-border/50 overflow-hidden">
-        <CardHeader className="bg-muted/30 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <Video className="h-5 w-5 text-primary" />
-            My Videos
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <VideoList key={refreshKey} teacherId={user.id} isTeacher={true} />
-        </CardContent>
-      </Card>
+      {/* Tabs: Videos / Quizzes / Games */}
+      <Tabs defaultValue="videos" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="videos" className="gap-2">
+            <Video className="h-4 w-4" />
+            <span className="hidden sm:inline">Videos</span>
+          </TabsTrigger>
+          <TabsTrigger value="quizzes" className="gap-2">
+            <ClipboardList className="h-4 w-4" />
+            <span className="hidden sm:inline">Quizzes</span>
+          </TabsTrigger>
+          <TabsTrigger value="games" className="gap-2">
+            <Ghost className="h-4 w-4" />
+            <span className="hidden sm:inline">Games</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="videos" className="space-y-6 mt-6">
+          <VideoUploadForm user={user} onUploadComplete={handleUploadComplete} />
+          <Card className="glass border-border/50 overflow-hidden">
+            <CardHeader className="bg-muted/30 border-b">
+              <CardTitle className="flex items-center gap-2">
+                <Video className="h-5 w-5 text-primary" />
+                My Videos
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <VideoList key={refreshKey} teacherId={user.id} isTeacher={true} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="quizzes" className="space-y-6 mt-6">
+          <Card className="glass border-border/50 overflow-hidden">
+            <CardHeader className="bg-muted/30 border-b">
+              <CardTitle className="flex items-center gap-2">
+                <ClipboardList className="h-5 w-5" />
+                {t("quiz.section")}
+              </CardTitle>
+              <CardDescription>{t("quiz.sectionDesc")}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8 p-6">
+              <CreateQuizForm user={user} onQuizCreated={() => setQuizRefreshKey(prev => prev + 1)} />
+              <div className="pt-4 border-t">
+                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                  <ClipboardList className="h-5 w-5 text-accent" />
+                  {t("quiz.myQuizzes")}
+                </h3>
+                <TeacherQuizList user={user} refreshKey={quizRefreshKey} />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="games" className="space-y-6 mt-6">
+          <CreatePacmanGameForm user={user} onCreated={() => setRefreshKey(prev => prev + 1)} />
+          <Card className="glass border-border/50 overflow-hidden">
+            <CardHeader className="bg-muted/30 border-b">
+              <CardTitle className="flex items-center gap-2">
+                <Ghost className="h-5 w-5 text-primary" />
+                My Pacman Games
+              </CardTitle>
+              <CardDescription>Question-based maze games for your students</CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <TeacherPacmanList user={user} refreshKey={refreshKey} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
