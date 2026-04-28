@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Trash2, Eye, EyeOff, Clock, Users } from "lucide-react";
+import StudentScoresDialog from "./StudentScoresDialog";
 
 interface TeacherQuizListProps {
   user: User;
@@ -99,6 +100,7 @@ const TeacherQuizList = ({ user, refreshKey }: TeacherQuizListProps) => {
                 </div>
               </div>
               <div className="flex gap-1">
+                <StudentScoresDialog contentId={quiz.id} contentTitle={quiz.title} type="quiz" />
                 <Button variant="ghost" size="icon" onClick={() => togglePublish(quiz.id, quiz.is_published)}>
                   {quiz.is_published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
