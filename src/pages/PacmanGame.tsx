@@ -277,10 +277,10 @@ const PacmanGame = () => {
           }
         }
 
-        // Ghost movement (frozen during grace period)
+        // Ghost movement (frozen during grace period, moves at half speed)
         if (graceRef.current > 0) {
           graceRef.current -= 1;
-        } else {
+        } else if (ghostShouldMove) {
           ghostsRef.current = ghostsRef.current.map((g) => {
             const candidates: Dir[] = [];
             for (const d of Object.values(DIRS)) {
