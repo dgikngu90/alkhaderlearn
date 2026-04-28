@@ -122,8 +122,25 @@ const PacmanGame = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (!gameId) return;
+    if (!gameId || !user) return;
     (async () => {
+      const { data: existing } = await supabase
+        .from("pacman_attempts")
+        .select("id")
+        .eq("game_id", gameId)
+        .eq("student_id", user.id)
+        .maybeSingle();
+      if (existing) {
+        setAlreadyPlayed(true);
+        const { data: game } = await supabase
+          .from("pacman_games")
+          .select("title")
+          .eq("id", gameId)
+          .maybeSingle();
+        setGameTitle(game?.title || "Pacman Game");
+        setLoading(false);
+        return;
+      }
       const { data: game } = await supabase
         .from("pacman_games")
         .select("title")
@@ -138,7 +155,7 @@ const PacmanGame = () => {
       setQuestions((qs as any) || []);
       setLoading(false);
     })();
-  }, [gameId]);
+  }, [gameId, user]);
 
   const resetPositions = useCallback(() => {
     playerRef.current = { x: SPAWN.x, y: SPAWN.y };
