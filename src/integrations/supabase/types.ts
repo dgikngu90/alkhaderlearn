@@ -634,6 +634,10 @@ export type Database = {
         }
         Returns: Json
       }
+      get_user_grade: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["grade_level"]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
