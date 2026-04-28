@@ -95,6 +95,7 @@ const PacmanGame = () => {
   const [correctCount, setCorrectCount] = useState(0);
   const [phase, setPhase] = useState<"intro" | "playing" | "finished">("intro");
   const [showFeedback, setShowFeedback] = useState<"correct" | "wrong" | null>(null);
+  const [alreadyPlayed, setAlreadyPlayed] = useState(false);
 
   // Player & ghosts state held in refs for smooth game loop
   const playerRef = useRef({ x: SPAWN.x, y: SPAWN.y });
