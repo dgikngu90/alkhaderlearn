@@ -100,6 +100,7 @@ const TeacherQuizList = ({ user, refreshKey }: TeacherQuizListProps) => {
                 </div>
               </div>
               <div className="flex gap-1">
+                <StudentScoresDialog contentId={quiz.id} contentTitle={quiz.title} type="quiz" />
                 <Button variant="ghost" size="icon" onClick={() => togglePublish(quiz.id, quiz.is_published)}>
                   {quiz.is_published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
