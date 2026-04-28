@@ -145,6 +145,7 @@ const PacmanGame = () => {
     queuedDirRef.current = null;
     ghostsRef.current = GHOST_SPAWNS.map((g) => ({ ...g, dir: DIRS.up }));
     graceRef.current = 12; // ~2 seconds of grace time after spawn
+    resolvedRef.current = false;
   }, []);
 
   const currentQuestion = questions[qIndex];
