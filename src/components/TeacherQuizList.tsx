@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Trash2, Eye, EyeOff, Clock, Users } from "lucide-react";
+import StudentScoresDialog from "./StudentScoresDialog";
 
 interface TeacherQuizListProps {
   user: User;
