@@ -73,7 +73,8 @@ const TeacherPacmanList = ({ user, refreshKey }: Props) => {
                 {g.description && <p className="text-xs text-muted-foreground truncate">{g.description}</p>}
               </div>
             </div>
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
+              <StudentScoresDialog contentId={g.id} contentTitle={g.title} type="pacman" />
               <div className="flex items-center gap-2">
                 <Switch checked={g.is_published} onCheckedChange={() => togglePublish(g)} />
                 <span className="text-xs text-muted-foreground">{g.is_published ? "Live" : "Draft"}</span>
