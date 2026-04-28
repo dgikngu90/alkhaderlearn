@@ -105,6 +105,8 @@ const PacmanGame = () => {
   const animationRef = useRef<number>(0);
   const phaseRef = useRef(phase);
   const graceRef = useRef(0); // ticks of invulnerability after spawn/respawn
+  const tickCountRef = useRef(0);
+  const resolvedRef = useRef(false); // prevents multi-trigger of letter collision
   phaseRef.current = phase;
 
   // Auth & data fetch
