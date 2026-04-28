@@ -95,6 +95,7 @@ const PacmanGame = () => {
   const [correctCount, setCorrectCount] = useState(0);
   const [phase, setPhase] = useState<"intro" | "playing" | "finished">("intro");
   const [showFeedback, setShowFeedback] = useState<"correct" | "wrong" | null>(null);
+  const [alreadyPlayed, setAlreadyPlayed] = useState(false);
 
   // Player & ghosts state held in refs for smooth game loop
   const playerRef = useRef({ x: SPAWN.x, y: SPAWN.y });
@@ -121,8 +122,25 @@ const PacmanGame = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (!gameId) return;
+    if (!gameId || !user) return;
     (async () => {
+      const { data: existing } = await supabase
+        .from("pacman_attempts")
+        .select("id")
+        .eq("game_id", gameId)
+        .eq("student_id", user.id)
+        .maybeSingle();
+      if (existing) {
+        setAlreadyPlayed(true);
+        const { data: game } = await supabase
+          .from("pacman_games")
+          .select("title")
+          .eq("id", gameId)
+          .maybeSingle();
+        setGameTitle(game?.title || "Pacman Game");
+        setLoading(false);
+        return;
+      }
       const { data: game } = await supabase
         .from("pacman_games")
         .select("title")
@@ -137,7 +155,7 @@ const PacmanGame = () => {
       setQuestions((qs as any) || []);
       setLoading(false);
     })();
-  }, [gameId]);
+  }, [gameId, user]);
 
   const resetPositions = useCallback(() => {
     playerRef.current = { x: SPAWN.x, y: SPAWN.y };
@@ -419,6 +437,25 @@ const PacmanGame = () => {
     );
   }
 
+  if (alreadyPlayed) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <Card className="max-w-md glass-vibrant">
+          <CardContent className="pt-6 text-center space-y-4">
+            <Trophy className="h-12 w-12 mx-auto text-amber-500" />
+            <h2 className="text-xl font-bold">You've already played this game</h2>
+            <p className="text-sm text-muted-foreground">
+              Each game can only be played once.
+            </p>
+            <Button onClick={() => navigate("/games")}>
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Games
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (questions.length === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -460,10 +497,9 @@ const PacmanGame = () => {
                 {correctCount} / {questions.length} correct answers
               </p>
               <div className="flex gap-2 justify-center pt-4">
-                <Button onClick={() => navigate("/games")} variant="outline">
+                <Button onClick={() => navigate("/games")}>
                   Back to Games
                 </Button>
-                <Button onClick={() => window.location.reload()}>Play Again</Button>
               </div>
             </CardContent>
           </Card>
