@@ -280,36 +280,39 @@ const PacmanGame = () => {
         // Ghost movement (frozen during grace period, moves at half speed)
         if (graceRef.current > 0) {
           graceRef.current -= 1;
-        } else if (ghostShouldMove) {
-          ghostsRef.current = ghostsRef.current.map((g) => {
-            const candidates: Dir[] = [];
-            for (const d of Object.values(DIRS)) {
-              if (d.dx === -g.dir.dx && d.dy === -g.dir.dy) continue;
-              if (!isWall(g.x + d.dx, g.y + d.dy)) candidates.push(d);
-            }
-            let chosen = g.dir;
-            if (candidates.length > 0) {
-              if (Math.random() < 0.5) {
-                const pr = playerRef.current;
-                candidates.sort((a, b) => {
-                  const da = Math.abs(g.x + a.dx - pr.x) + Math.abs(g.y + a.dy - pr.y);
-                  const db = Math.abs(g.x + b.dx - pr.x) + Math.abs(g.y + b.dy - pr.y);
-                  return da - db;
-                });
-                chosen = candidates[0];
-              } else {
-                chosen = candidates[Math.floor(Math.random() * candidates.length)];
+        } else {
+          if (ghostShouldMove) {
+            ghostsRef.current = ghostsRef.current.map((g) => {
+              const candidates: Dir[] = [];
+              for (const d of Object.values(DIRS)) {
+                if (d.dx === -g.dir.dx && d.dy === -g.dir.dy) continue;
+                if (!isWall(g.x + d.dx, g.y + d.dy)) candidates.push(d);
               }
-            } else if (!isWall(g.x - g.dir.dx, g.y - g.dir.dy)) {
-              chosen = { dx: -g.dir.dx, dy: -g.dir.dy };
-            }
-            let nx = g.x + chosen.dx;
-            if (nx < 0) nx = COLS - 1;
-            if (nx >= COLS) nx = 0;
-            return { x: nx, y: g.y + chosen.dy, dir: chosen };
-          });
+              let chosen = g.dir;
+              if (candidates.length > 0) {
+                // Mostly random wandering, only ~20% chase
+                if (Math.random() < 0.2) {
+                  const pr = playerRef.current;
+                  candidates.sort((a, b) => {
+                    const da = Math.abs(g.x + a.dx - pr.x) + Math.abs(g.y + a.dy - pr.y);
+                    const db = Math.abs(g.x + b.dx - pr.x) + Math.abs(g.y + b.dy - pr.y);
+                    return da - db;
+                  });
+                  chosen = candidates[0];
+                } else {
+                  chosen = candidates[Math.floor(Math.random() * candidates.length)];
+                }
+              } else if (!isWall(g.x - g.dir.dx, g.y - g.dir.dy)) {
+                chosen = { dx: -g.dir.dx, dy: -g.dir.dy };
+              }
+              let nx = g.x + chosen.dx;
+              if (nx < 0) nx = COLS - 1;
+              if (nx >= COLS) nx = 0;
+              return { x: nx, y: g.y + chosen.dy, dir: chosen };
+            });
+          }
 
-          // Check ghost collision -> respawn player (only when not in grace)
+          // Check ghost collision every tick -> respawn player
           const pp = playerRef.current;
           for (const g of ghostsRef.current) {
             if (g.x === pp.x && g.y === pp.y) {
