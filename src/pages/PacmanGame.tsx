@@ -232,7 +232,8 @@ const PacmanGame = () => {
   useEffect(() => {
     if (phase !== "playing" || !currentQuestion) return;
 
-    const TICK_MS = 180;
+    const TICK_MS = 150;
+    tickCountRef.current = 0;
 
     const loop = (ts: number) => {
       if (!lastTickRef.current) lastTickRef.current = ts;
@@ -240,6 +241,8 @@ const PacmanGame = () => {
 
       if (elapsed >= TICK_MS) {
         lastTickRef.current = ts;
+        tickCountRef.current += 1;
+        const ghostShouldMove = tickCountRef.current % 2 === 0; // ghosts move at half speed
         // Player movement
         const queued = queuedDirRef.current;
         const player = playerRef.current;
