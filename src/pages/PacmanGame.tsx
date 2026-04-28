@@ -521,15 +521,15 @@ const PacmanGame = () => {
               />
             </div>
 
-            {/* On-screen D-pad controls (always visible above bottom nav) */}
-            <div className="sticky bottom-20 z-10 grid grid-cols-3 gap-2 max-w-[240px] mx-auto select-none">
+            {/* On-screen D-pad controls */}
+            <div className="grid grid-cols-3 gap-2 w-[220px] mx-auto select-none mt-2">
               <div />
               <Button
                 variant="secondary"
                 size="lg"
-                className="h-14 text-2xl shadow-lg"
+                className="h-14 text-2xl shadow-lg active:scale-95"
                 onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.up); }}
-                onClick={() => handleDirButton(DIRS.up)}
+                onMouseDown={() => handleDirButton(DIRS.up)}
               >
                 ▲
               </Button>
@@ -537,27 +537,27 @@ const PacmanGame = () => {
               <Button
                 variant="secondary"
                 size="lg"
-                className="h-14 text-2xl shadow-lg"
+                className="h-14 text-2xl shadow-lg active:scale-95"
                 onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.left); }}
-                onClick={() => handleDirButton(DIRS.left)}
+                onMouseDown={() => handleDirButton(DIRS.left)}
               >
                 ◀
               </Button>
               <Button
                 variant="secondary"
                 size="lg"
-                className="h-14 text-2xl shadow-lg"
+                className="h-14 text-2xl shadow-lg active:scale-95"
                 onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.down); }}
-                onClick={() => handleDirButton(DIRS.down)}
+                onMouseDown={() => handleDirButton(DIRS.down)}
               >
                 ▼
               </Button>
               <Button
                 variant="secondary"
                 size="lg"
-                className="h-14 text-2xl shadow-lg"
+                className="h-14 text-2xl shadow-lg active:scale-95"
                 onTouchStart={(e) => { e.preventDefault(); handleDirButton(DIRS.right); }}
-                onClick={() => handleDirButton(DIRS.right)}
+                onMouseDown={() => handleDirButton(DIRS.right)}
               >
                 ▶
               </Button>
