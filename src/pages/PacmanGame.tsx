@@ -437,6 +437,25 @@ const PacmanGame = () => {
     );
   }
 
+  if (alreadyPlayed) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <Card className="max-w-md glass-vibrant">
+          <CardContent className="pt-6 text-center space-y-4">
+            <Trophy className="h-12 w-12 mx-auto text-amber-500" />
+            <h2 className="text-xl font-bold">You've already played this game</h2>
+            <p className="text-sm text-muted-foreground">
+              Each game can only be played once.
+            </p>
+            <Button onClick={() => navigate("/games")}>
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Games
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (questions.length === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
