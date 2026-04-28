@@ -174,6 +174,8 @@ const PacmanGame = () => {
   const advance = useCallback(
     (chosen: "a" | "b" | "c" | "d") => {
       if (!currentQuestion) return;
+      if (resolvedRef.current) return;
+      resolvedRef.current = true;
       const isCorrect = chosen === currentQuestion.correct_answer;
       if (isCorrect) {
         setPoints((p) => p + 5);
