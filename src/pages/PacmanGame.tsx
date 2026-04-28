@@ -497,10 +497,9 @@ const PacmanGame = () => {
                 {correctCount} / {questions.length} correct answers
               </p>
               <div className="flex gap-2 justify-center pt-4">
-                <Button onClick={() => navigate("/games")} variant="outline">
+                <Button onClick={() => navigate("/games")}>
                   Back to Games
                 </Button>
-                <Button onClick={() => window.location.reload()}>Play Again</Button>
               </div>
             </CardContent>
           </Card>
