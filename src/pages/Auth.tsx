@@ -70,7 +70,14 @@ const Auth = () => {
     });
 
     if (error) {
-      throw new Error("Could not assign your role during signup. Please try again.");
+      // Student role is auto-assigned by the database trigger, so this is non-fatal.
+      // For teacher signups, surface the failure so the user can retry.
+      if (import.meta.env.DEV) {
+        console.error('registerRole edge function failed:', error);
+      }
+      if (selectedRole === 'teacher') {
+        throw new Error("Could not assign your teacher role. Please try again.");
+      }
     }
   };
 
