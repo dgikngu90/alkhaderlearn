@@ -76,6 +76,10 @@ const VideoList = ({ teacherId, userId, isTeacher, selectedCategory, selectedGra
       if (data) {
         const thumbnailPromises = data.map(async (video) => {
           if (video.thumbnail_url) {
+            // YouTube thumbnails are direct https URLs — don't sign
+            if (video.thumbnail_url.startsWith("http")) {
+              return { id: video.id, url: video.thumbnail_url };
+            }
             const path = extractStoragePath(video.thumbnail_url);
             const { data: signedData } = await supabase.storage
               .from('videos')
