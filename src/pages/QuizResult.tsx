@@ -26,10 +26,7 @@ const QuizResult = () => {
       setAttempt(attemptData);
 
       const { data: questionsData } = await supabase
-        .from("quiz_questions")
-        .select("*")
-        .eq("quiz_id", attemptData.quiz_id)
-        .order("order_index");
+        .rpc("get_quiz_questions_for_review", { p_attempt_id: attemptId });
 
       setQuestions(questionsData || []);
       setLoading(false);
