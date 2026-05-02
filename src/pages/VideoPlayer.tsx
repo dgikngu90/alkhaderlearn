@@ -45,6 +45,14 @@ const VideoPlayer = () => {
 
         setVideoTitle(video.title);
 
+        // YouTube video — set URL directly, skip storage
+        if (video.video_url?.startsWith("youtube:")) {
+          const ytId = video.video_url.replace("youtube:", "");
+          setVideoUrl(`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`);
+          setLoading(false);
+          return;
+        }
+
         // Extract storage path
         const extractStoragePath = (url: string): string => {
           if (url.includes('/storage/v1/object/public/videos/')) {
@@ -197,7 +205,17 @@ const VideoPlayer = () => {
         <h1 className="text-white text-xl font-bold mb-4 px-4">{videoTitle}</h1>
         
         <div className="w-full max-w-5xl mx-auto">
-          {videoUrl && (
+          {videoUrl && videoUrl.includes("youtube.com/embed") ? (
+            <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+              <iframe
+                src={videoUrl}
+                className="absolute top-0 left-0 w-full h-full rounded-lg"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title={videoTitle}
+              />
+            </div>
+          ) : videoUrl ? (
             <video
               ref={videoRef}
               controls
@@ -209,7 +227,7 @@ const VideoPlayer = () => {
               <source src={videoUrl} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
-          )}
+          ) : null}
         </div>
         
         {earnedPoints > 0 && (

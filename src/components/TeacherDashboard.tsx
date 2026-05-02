@@ -7,6 +7,7 @@ import { Video, Mail, ClipboardList, Users, Trophy, Inbox, Ghost } from "lucide-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VideoList from "./VideoList";
 import VideoUploadForm from "./VideoUploadForm";
+import YoutubeUploadForm from "./YoutubeUploadForm";
 import SendMessageDialog from "./SendMessageDialog";
 import CreateQuizForm from "./CreateQuizForm";
 import TeacherQuizList from "./TeacherQuizList";
@@ -160,6 +161,7 @@ const TeacherDashboard = ({ user }: TeacherDashboardProps) => {
 
         <TabsContent value="videos" className="space-y-6 mt-6">
           <VideoUploadForm user={user} onUploadComplete={handleUploadComplete} />
+          <YoutubeUploadForm user={user} onUploadComplete={handleUploadComplete} />
           <Card className="glass border-border/50 overflow-hidden">
             <CardHeader className="bg-muted/30 border-b">
               <CardTitle className="flex items-center gap-2">
