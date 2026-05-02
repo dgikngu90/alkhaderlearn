@@ -78,10 +78,7 @@ const TakeQuiz = () => {
       setQuiz(quizData);
 
       const { data: questionsData } = await supabase
-        .from("quiz_questions")
-        .select("*")
-        .eq("quiz_id", quizId)
-        .order("order_index");
+        .rpc("get_quiz_questions_safe", { p_quiz_id: quizId });
 
       setQuestions(questionsData || []);
 
