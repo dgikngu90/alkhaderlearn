@@ -135,6 +135,7 @@ const Auth = () => {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: fullName,
+            ...(role === "student" && grade ? { grade } : {}),
           },
         },
       });
