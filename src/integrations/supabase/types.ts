@@ -634,6 +634,31 @@ export type Database = {
         }
         Returns: Json
       }
+      get_quiz_questions_for_review: {
+        Args: { p_attempt_id: string }
+        Returns: {
+          correct_answer: string
+          id: string
+          options: Json
+          order_index: number
+          points: number
+          question_text: string
+          question_type: string
+          quiz_id: string
+        }[]
+      }
+      get_quiz_questions_safe: {
+        Args: { p_quiz_id: string }
+        Returns: {
+          id: string
+          options: Json
+          order_index: number
+          points: number
+          question_text: string
+          question_type: string
+          quiz_id: string
+        }[]
+      }
       get_user_grade: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["grade_level"]
