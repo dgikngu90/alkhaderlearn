@@ -122,6 +122,47 @@ export type Database = {
         }
         Relationships: []
       }
+      lessons: {
+        Row: {
+          created_at: string
+          id: string
+          module_id: string
+          notes: string | null
+          order_index: number
+          title: string
+          updated_at: string
+          youtube_video_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          module_id: string
+          notes?: string | null
+          order_index?: number
+          title: string
+          updated_at?: string
+          youtube_video_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          module_id?: string
+          notes?: string | null
+          order_index?: number
+          title?: string
+          updated_at?: string
+          youtube_video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -152,6 +193,42 @@ export type Database = {
           recipient_id?: string | null
           sender_id?: string
           title?: string
+        }
+        Relationships: []
+      }
+      modules: {
+        Row: {
+          created_at: string
+          description: string | null
+          grade: Database["public"]["Enums"]["grade_level"] | null
+          id: string
+          is_published: boolean
+          order_index: number
+          teacher_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          grade?: Database["public"]["Enums"]["grade_level"] | null
+          id?: string
+          is_published?: boolean
+          order_index?: number
+          teacher_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          grade?: Database["public"]["Enums"]["grade_level"] | null
+          id?: string
+          is_published?: boolean
+          order_index?: number
+          teacher_id?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
