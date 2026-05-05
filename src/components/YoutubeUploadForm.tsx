@@ -40,7 +40,7 @@ const YoutubeUploadForm = ({ user, onUploadComplete }: Props) => {
   const [grade, setGrade] = useState<string>("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
 
-  const categories = ["عربي", "English", "علوم حياتية", "كيمياء", "علوم ارض", "رياضيات", "مالية"];
+  const categories = ["عربي", "English", "علوم حياتية", "كيمياء", "علوم ارض", "رياضيات", "فيزياء", "مالية"];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
