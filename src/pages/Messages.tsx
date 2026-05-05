@@ -10,6 +10,7 @@ import { ArrowLeft, Mail, MailOpen, Megaphone, User as UserIcon, Send, Inbox, Tr
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import StudentSendMessageDialog from "@/components/StudentSendMessageDialog";
+import SendMessageDialog from "@/components/SendMessageDialog";
 import logo from "@/assets/logo.png";
 
 interface Message {
@@ -292,7 +293,9 @@ const Messages = () => {
                   Mark all read
                 </Button>
               )}
-              {user && <StudentSendMessageDialog user={user} />}
+              {user && (userRole === "teacher" || userRole === "admin"
+                ? <SendMessageDialog user={user} />
+                : <StudentSendMessageDialog user={user} />)}
             </div>
           </div>
 
