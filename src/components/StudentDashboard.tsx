@@ -19,6 +19,7 @@ import englishBg from "@/assets/category-english.jpeg";
 import chemistryBg from "@/assets/category-chemistry-new.jpeg";
 import mathBg from "@/assets/category-math.jpeg";
 import financeBg from "@/assets/category-finance.jpeg";
+import physicsBg from "@/assets/category-physics.jpeg";
 
 interface StudentDashboardProps {
   user: User | null;
@@ -50,6 +51,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
     { name: "علوم حياتية", image: biologyBg, color: "from-emerald-500 to-cyan-500" },
     { name: "كيمياء", image: chemistryBg, color: "from-amber-500 to-orange-500" },
     { name: "رياضيات", image: mathBg, color: "from-cyan-500 to-blue-500" },
+    { name: "فيزياء", image: physicsBg, color: "from-indigo-500 to-purple-500" },
     { name: "مالية", image: financeBg, color: "from-violet-500 to-primary" },
   ];
 
