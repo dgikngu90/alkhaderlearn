@@ -293,7 +293,9 @@ const Messages = () => {
                   Mark all read
                 </Button>
               )}
-              {user && <StudentSendMessageDialog user={user} />}
+              {user && (userRole === "teacher" || userRole === "admin"
+                ? <SendMessageDialog user={user} />
+                : <StudentSendMessageDialog user={user} />)}
             </div>
           </div>
 
