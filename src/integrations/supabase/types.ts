@@ -172,6 +172,7 @@ export type Database = {
           read_at: string | null
           recipient_id: string | null
           sender_id: string
+          target_grade: Database["public"]["Enums"]["grade_level"] | null
           title: string
         }
         Insert: {
@@ -182,6 +183,7 @@ export type Database = {
           read_at?: string | null
           recipient_id?: string | null
           sender_id: string
+          target_grade?: Database["public"]["Enums"]["grade_level"] | null
           title: string
         }
         Update: {
@@ -192,6 +194,7 @@ export type Database = {
           read_at?: string | null
           recipient_id?: string | null
           sender_id?: string
+          target_grade?: Database["public"]["Enums"]["grade_level"] | null
           title?: string
         }
         Relationships: []
