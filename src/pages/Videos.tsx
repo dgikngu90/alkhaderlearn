@@ -35,6 +35,14 @@ const Videos = () => {
     { name: "رياضيات", image: mathBg, color: "from-cyan-500 to-blue-500" },
     { name: "فيزياء", image: physicsBg, color: "from-indigo-500 to-purple-500" },
     { name: "مالية", image: financeBg, color: "from-violet-500 to-primary" },
+    { name: "علوم الارض", image: biologyBg, color: "from-teal-500 to-emerald-500" },
+    { name: "احياء", image: biologyBg, color: "from-green-500 to-emerald-500" },
+    { name: "وطنيه", image: arabicBg, color: "from-red-500 to-rose-500" },
+    { name: "دين", image: arabicBg, color: "from-emerald-600 to-teal-600" },
+    { name: "تاريخ", image: arabicBg, color: "from-amber-600 to-yellow-600" },
+    { name: "حاسوب", image: mathBg, color: "from-blue-500 to-indigo-500" },
+    { name: "جغرافيه", image: biologyBg, color: "from-sky-500 to-cyan-500" },
+    { name: "مهني", image: financeBg, color: "from-stone-500 to-zinc-500" },
   ];
 
   return (
