@@ -14,6 +14,13 @@ import chemistryBg from "@/assets/category-chemistry-new.jpeg";
 import mathBg from "@/assets/category-math.jpeg";
 import financeBg from "@/assets/category-finance.jpeg";
 import physicsBg from "@/assets/category-physics.jpeg";
+import vocationalBg from "@/assets/category-vocational.webp";
+import computingBg from "@/assets/category-computing.jpeg";
+import historyBg from "@/assets/category-history.webp";
+import nationalBg from "@/assets/category-national.jpg";
+import religionBg from "@/assets/category-religion.jpeg";
+import earthBg from "@/assets/category-earth.jpg";
+import geographyBg from "@/assets/category-geography.webp";
 
 const Videos = () => {
   const { t } = useLanguage();
@@ -35,14 +42,13 @@ const Videos = () => {
     { name: "رياضيات", image: mathBg, color: "from-cyan-500 to-blue-500" },
     { name: "فيزياء", image: physicsBg, color: "from-indigo-500 to-purple-500" },
     { name: "مالية", image: financeBg, color: "from-violet-500 to-primary" },
-    { name: "علوم الارض", image: biologyBg, color: "from-teal-500 to-emerald-500" },
-    { name: "احياء", image: biologyBg, color: "from-green-500 to-emerald-500" },
-    { name: "وطنيه", image: arabicBg, color: "from-red-500 to-rose-500" },
-    { name: "دين", image: arabicBg, color: "from-emerald-600 to-teal-600" },
-    { name: "تاريخ", image: arabicBg, color: "from-amber-600 to-yellow-600" },
-    { name: "حاسوب", image: mathBg, color: "from-blue-500 to-indigo-500" },
-    { name: "جغرافيه", image: biologyBg, color: "from-sky-500 to-cyan-500" },
-    { name: "مهني", image: financeBg, color: "from-stone-500 to-zinc-500" },
+    { name: "علوم الارض", image: earthBg, color: "from-teal-500 to-emerald-500" },
+    { name: "وطنيه", image: nationalBg, color: "from-red-500 to-rose-500" },
+    { name: "دين", image: religionBg, color: "from-emerald-600 to-teal-600" },
+    { name: "تاريخ", image: historyBg, color: "from-amber-600 to-yellow-600" },
+    { name: "حاسوب", image: computingBg, color: "from-blue-500 to-indigo-500" },
+    { name: "جغرافيه", image: geographyBg, color: "from-sky-500 to-cyan-500" },
+    { name: "مهني", image: vocationalBg, color: "from-stone-500 to-zinc-500" },
   ];
 
   return (
