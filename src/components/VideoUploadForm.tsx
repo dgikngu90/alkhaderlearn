@@ -33,7 +33,7 @@ const VideoUploadForm = ({ user, onUploadComplete }: VideoUploadFormProps) => {
   const xhrRef = useRef<XMLHttpRequest | null>(null);
   const uploadStartTimeRef = useRef<number>(0);
 
-  const categories = ["عربي", "English", "علوم حياتية", "كيمياء", "علوم ارض", "رياضيات", "فيزياء", "مالية"];
+  const categories = ["عربي", "English", "علوم حياتية", "احياء", "كيمياء", "فيزياء", "علوم الارض", "رياضيات", "حاسوب", "مالية", "تاريخ", "جغرافيه", "وطنيه", "دين", "مهني"];
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
