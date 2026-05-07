@@ -13,6 +13,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { GRADES } from "@/constants/grades";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import promoVideo from "@/assets/alkhader-learn.mp4";
 import arabicBg from "@/assets/category-arabic.jpeg";
 import biologyBg from "@/assets/category-biology.jpeg";
 import englishBg from "@/assets/category-english.jpeg";
