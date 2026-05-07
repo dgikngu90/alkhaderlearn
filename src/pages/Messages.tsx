@@ -52,18 +52,21 @@ const Messages = () => {
         .eq("user_id", user.id);
       
       const roles = roleData?.map(r => r.role) || [];
+      let role = "student";
       if (roles.includes("teacher")) {
+        role = "teacher";
         setUserRole("teacher");
       } else if (roles.includes("admin")) {
+        role = "admin";
         setUserRole("admin");
       }
       
-      fetchMessages(user.id);
+      fetchMessages(user.id, role);
     };
     getUser();
   }, [navigate]);
 
-  const fetchMessages = async (userId: string) => {
+  const fetchMessages = async (userId: string, role: string = "student") => {
     try {
       const { data: messagesData, error } = await supabase
         .from("messages")
@@ -92,7 +95,10 @@ const Messages = () => {
       })) || [];
 
       const received = messagesWithNames.filter(m => 
-        m.recipient_id === userId || m.is_broadcast
+        m.sender_id !== userId && (
+          m.recipient_id === userId ||
+          (m.is_broadcast && role === "student")
+        )
       );
       const sent = messagesWithNames.filter(m => m.sender_id === userId);
 
