@@ -22,6 +22,15 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
     supabase.from("profiles").select("id", { count: "exact", head: true }).then(({ count }) => {
       setUserCount(count || 0);
     });
+    supabase.from("videos").select("id", { count: "exact", head: true }).then(({ count }) => {
+      setVideoCount(count || 0);
+    });
+    supabase.from("messages").select("id", { count: "exact", head: true }).then(({ count }) => {
+      setMessageCount(count || 0);
+    });
+    supabase.from("banned_users").select("id", { count: "exact", head: true }).then(({ count }) => {
+      setBannedCount(count || 0);
+    });
   }, []);
 
   return (
