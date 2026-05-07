@@ -7,6 +7,11 @@ import { MessageCircle, Send, Sparkles, Bot, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import remarkGfm from "remark-gfm";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 
 interface ChatMessage {
   id: string;
