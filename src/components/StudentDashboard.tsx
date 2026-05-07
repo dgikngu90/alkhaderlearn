@@ -200,7 +200,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
                 asChild
                 className="px-8 py-6 text-lg rounded-full glow-multi press-effect animate-bounce-in bg-gradient-to-r from-primary via-violet-500 to-accent border-0"
               >
-                <a href="https://median.co/share/eeekywy#apk" target="_blank" rel="noopener noreferrer">
+                <a href="https://median.co/share/mberdba#apk" target="_blank" rel="noopener noreferrer">
                   <Download className="mr-2 h-5 w-5" />
                   Download App
                   <Sparkles className="ml-2 h-4 w-4 text-amber-300" />
