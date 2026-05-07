@@ -13,6 +13,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { GRADES } from "@/constants/grades";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import promoVideo from "@/assets/alkhader-learn.mp4";
 import arabicBg from "@/assets/category-arabic.jpeg";
 import biologyBg from "@/assets/category-biology.jpeg";
 import englishBg from "@/assets/category-english.jpeg";
@@ -100,6 +101,16 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
           <div className="absolute top-1/2 left-1/4 w-48 h-48 bg-cyan/20 rounded-full blur-3xl animate-float-reverse" />
 
           <div className="max-w-4xl mx-auto text-center space-y-8 relative stagger-children">
+            {/* Promo Video */}
+            <div className="mb-6 rounded-2xl overflow-hidden glass-vibrant border border-primary/20 shadow-xl max-w-3xl mx-auto">
+              <video
+                src={promoVideo}
+                controls
+                playsInline
+                preload="metadata"
+                className="w-full h-auto block"
+              />
+            </div>
             {/* Announcements */}
             {announcements.length > 0 && (
               <div className="mb-8 animate-in fade-in zoom-in duration-1000">
