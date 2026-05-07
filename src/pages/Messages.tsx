@@ -97,7 +97,7 @@ const Messages = () => {
       const received = messagesWithNames.filter(m => 
         m.sender_id !== userId && (
           m.recipient_id === userId ||
-          (m.is_broadcast && userRole === "student")
+          (m.is_broadcast && role === "student")
         )
       );
       const sent = messagesWithNames.filter(m => m.sender_id === userId);
