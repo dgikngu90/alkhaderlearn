@@ -91,7 +91,7 @@ const Index = () => {
               asChild 
               className="text-base px-8 py-6 rounded-full press-effect border-2 border-accent/30 hover:border-accent hover:bg-accent/10"
             >
-              <a href="https://median.co/share/eeekywy#apk" target="_blank" rel="noopener noreferrer">
+              <a href="https://median.co/share/mberdba#apk" target="_blank" rel="noopener noreferrer">
                 <Download className="mr-2 h-5 w-5" />
                 Download App
               </a>
