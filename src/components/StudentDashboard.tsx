@@ -254,6 +254,34 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Download App Section */}
+        <div className="px-4 pb-12 max-w-md mx-auto">
+          <Card className="glass-vibrant text-center relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-violet-500 to-accent" />
+            <CardHeader className="pt-8 pb-2">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-2 shadow-lg group-hover:scale-110 transition-transform">
+                <Download className="h-8 w-8 text-white" />
+              </div>
+              <CardTitle className="text-lg gradient-text">Download App</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Get the Alkhader Learn app on your phone
+              </p>
+              <Button
+                size="lg"
+                asChild
+                className="rounded-full glow-multi press-effect bg-gradient-to-r from-primary via-violet-500 to-accent border-0"
+              >
+                <a href="https://median.co/share/mberdba#apk" target="_blank" rel="noopener noreferrer">
+                  <Download className="mr-2 h-5 w-5" />
+                  Download Now
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <BottomNavigation />
