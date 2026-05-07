@@ -7,6 +7,11 @@ import { MessageCircle, Send, Sparkles, Bot, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import remarkGfm from "remark-gfm";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 
 interface ChatMessage {
   id: string;
@@ -173,7 +178,18 @@ const StudyAssistantChat = () => {
                         <span className="text-xs font-medium text-violet-500">AI</span>
                       </div>
                     )}
-                    <p className="leading-relaxed">{message.content}</p>
+                    {message.role === "assistant" ? (
+                      <div className="leading-relaxed prose prose-sm dark:prose-invert max-w-none break-words [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_.katex-display]:my-2 [&_.katex-display]:overflow-x-auto">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkMath, remarkGfm]}
+                          rehypePlugins={[rehypeKatex]}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p className="leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                    )}
                   </div>
                 </div>
               ))}
